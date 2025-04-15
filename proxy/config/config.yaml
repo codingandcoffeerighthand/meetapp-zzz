@@ -1,0 +1,11 @@
+server:
+  port: 60000
+  host: 0.0.0.0
+  env: dev
+
+cloudflare:
+  base_url: https://rtc.live.cloudflare.com/v1
+  app_id: 977c39eac9a8fc03a471d7da6a7d66e0
+  app_secret: f069115dbeb5847040e7dbb7f9c79772fa923534fe1f74e3a62d54561aa12118
+  turn_id: 4f88cf5ab3d61f069a9c7fe38502ddef
+  turn_token: 5a8acf5e87457eea45222ec73195fb560704cbfe949928946694f05b7c76f5f3

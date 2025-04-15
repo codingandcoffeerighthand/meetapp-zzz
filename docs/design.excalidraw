@@ -1,0 +1,51 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
+  "elements": [
+    {
+      "id": "nlY0S8aMCQorHsnhW-fN3",
+      "type": "text",
+      "x": 363,
+      "y": -207,
+      "width": 614.7398376464844,
+      "height": 430.7263082482272,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 342146475,
+      "version": 432,
+      "versionNonce": 851882085,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1744647819053,
+      "link": null,
+      "locked": false,
+      "text": "features:\n- user login with wallet\n- user logout\n- user create room\n- join room\n- leave room\n- send message to room\n- send message to participant in room\n- roomm info\n- participant info\n",
+      "fontSize": 31.32554969078016,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "features:\n- user login with wallet\n- user logout\n- user create room\n- join room\n- leave room\n- send message to room\n- send message to participant in room\n- roomm info\n- participant info\n",
+      "autoResize": false,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
