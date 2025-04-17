@@ -6,3 +6,11 @@ deploy-contract:
 		--rpc-url $(RPC) --private-key $(PRIVKEY) --broadcast
 .PHONY: deploy-contract
 			
+get-abi:
+	forge inspect --json DAppMeeting abi > meeting.json
+	cp meeting.json ../proxy/pkg/smartcontracts/meeting.json
+.PHONY: get-abi
+
+get-meeting-contract-address:
+	cat broadcast/meeting.s.sol/11155111/run-latest.json | grep "contractAddress"
+.PHONY: get-meeting-contract-address
