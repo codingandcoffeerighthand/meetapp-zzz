@@ -3,8 +3,8 @@ package infras_cloudflare
 import (
 	"context"
 	"net/http"
-	"proxy-srv/gencode/cloudflare_client"
 	"proxy-srv/internal/configs"
+	"proxy-srv/pkg/gencode/cloudflare_client"
 )
 
 func NewClient(cfg configs.CloudflareConfig) (cloudflare_client.ClientWithResponsesInterface, error) {

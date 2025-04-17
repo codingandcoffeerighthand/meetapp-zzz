@@ -1,5 +1,5 @@
 server:
-  port: 60000
+  port: 6001
   host: 0.0.0.0
   env: dev
 

@@ -5,3 +5,7 @@ go-tools:
 go-generate:
 	go generate ./...
 .PHONY: go-generate
+	
+get-abi:
+	pnpx solc --combined-json abi,bin ../smartcontract/src/meeting.sol > gencode/smartcontracts/meeting.abi
+.PHONY: get-abi
