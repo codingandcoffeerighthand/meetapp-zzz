@@ -62,7 +62,7 @@ contract DAppMeeting {
     event ParticipantLeft(string roomId, address participant);
     event TrackAdded(string roomId, address participant, string trackName);
     event EventForwardedToBackend(string roomId, address sender, bytes eventData);
-    event EventForwardedToFrontend(string roomId, address participant, bytes eventData);
+    event EventForwardedToFrontend(string roomId, address indexed participant, bytes eventData);
     event RoomCreated(string roomId);
     event SetParticipantSessionID(string roomId, address participant, string sessionID);
     /*
@@ -301,6 +301,7 @@ contract DAppMeeting {
     function forwardEventToFrontend(string memory _roomId, address _participant, bytes memory _eventData)
         public
         roomExists(_roomId)
+        onlyOwner
     {
         require(participantsInRoom[_roomId][_participant], "Target participant not in room");
         emit EventForwardedToFrontend(_roomId, _participant, _eventData);

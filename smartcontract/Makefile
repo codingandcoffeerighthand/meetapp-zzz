@@ -1,11 +1,11 @@
 RPC = ws://localhost:8545
 PRIVATE_KEY := ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+CHAINID = 31337
 
 deploy-contract:
+	forge build
 	forge script script/meeting.s.sol \
 		--rpc-url $(RPC) --private-key $(PRIVATE_KEY) --broadcast
-	update_yaml
-	get-abi
 .PHONY: deploy-contract
 
 WEB_ABI_PATH = ../web/src/abi/abi.json
@@ -22,7 +22,7 @@ gen-abi:
 ##################################################################
 
 # Tên file JSON chứa contractAddress
-JSON_FILE = broadcast/meeting.s.sol/31337/run-latest.json
+JSON_FILE = broadcast/meeting.s.sol/${CHAINID}/run-latest.json
 
 # Tên file YAML cần cập nhật
 YAML_FILE = ../server/config/config.yaml
@@ -44,4 +44,7 @@ update_yaml:
 
 anvil-up:
 	anvil --state ./cache/anvil_state.json
-.PHONY: anvil
+.PHONY: anvil-up
+
+deploy: deploy-contract gen-abi update_yaml
+.PHONY: deploy
