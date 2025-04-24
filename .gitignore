@@ -1,0 +1,4 @@
+.qodo
+**/config.yaml
+**/*.tmp.txt
+**/__debug_bin*

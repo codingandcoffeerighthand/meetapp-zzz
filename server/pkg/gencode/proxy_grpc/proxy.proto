@@ -1,0 +1,20 @@
+syntax = "proto3";
+package proxy_grpc;
+option go_package="grpc/proxy_grpc";
+
+service ProxyService {
+    rpc PUTRenegotiateSession(PUTRenegotiateSessionRequest) returns (PUTRenegotiateSessionResponse);
+    rpc EmitParicipantJoinedToRom(EmitParicipantJoinedToRomRequest) returns (EmitParicipantJoinedToRomResponse);
+}
+
+message PUTRenegotiateSessionRequest {
+    string session_id = 1;
+    string sdp_answer = 2;
+}
+message PUTRenegotiateSessionResponse {}
+
+message EmitParicipantJoinedToRomRequest {
+    string room_id = 1;
+}
+message EmitParicipantJoinedToRomResponse {
+}

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package ws_srv;
+option go_package = "grpc/ws_grpc";
+
+service WebsocketServices {
+    rpc EmitRoomCreated(EmitRoomCreatedRequest) returns (EmitRoomCreatedResponse);
+    rpc EmitJoinRoom(EmitJoinRoomReequest) returns (EmitJoinRoomResponse);
+    rpc EmitRequireRenegotiateSession(EmitRequireRenegotiateSessionRequest) returns (EmitRequireRenegotiateSessionResponse);
+}
+
+message EmitRoomCreatedRequest {
+    string room_id = 1;
+}
+message EmitRoomCreatedResponse{}
+message EmitJoinRoomReequest{
+    string room_id = 1;
+    string participant_address = 2;
+    string session_id = 3;
+    string sdp_answer = 4;
+    string sdp_offer = 5;
+}
+message EmitJoinRoomResponse {}
+
+message EmitRequireRenegotiateSessionRequest {
+    string room_id = 1;
+    string participant_address = 2;
+    string session_id = 3;
+    string sdp_offer = 4;
+}
+message EmitRequireRenegotiateSessionResponse {}

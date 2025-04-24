@@ -1,8 +1,20 @@
 // SPDX-License-Identifier: M
 pragma solidity ^0.8.0;
 
+/**
+ * @title DAppMeeting
+ * @dev A smart contract for managing virtual meeting rooms, participants, and media tracks.
+ *      It includes functionalities for creating rooms, managing participants, and handling
+ *      media tracks associated with participants. The contract also supports event forwarding
+ *      to backend and frontend systems, and includes access control mechanisms for authorized
+ *      backends and the contract owner.
+ */
 contract DAppMeeting {
-    // Structures
+    /*
+        *******************************
+        ***      Structures         ***
+        *******************************
+    */
     struct Track {
         string trackName; // Name of the track
         string mid; // Media identifier in WebRTC
@@ -24,7 +36,11 @@ contract DAppMeeting {
         Participant[] participants; // List of participants
     }
 
-    // State variables
+    /*
+        *******************************
+        ***      State Variables    ***
+        *******************************
+    */
     mapping(string => Room) public rooms; // Store rooms by roomId
     mapping(string => mapping(address => uint256)) public participantIndices; // Track participant indices in arrays
     mapping(string => mapping(address => bool)) public participantsInRoom; // Check if participant is in room
@@ -37,18 +53,34 @@ contract DAppMeeting {
     address public owner;
     address[] public authorizedBackends;
 
-    // Events
-    event ParticipantJoined(string roomId, address participant, Track[] initialTracks);
+    /*
+        *******************************
+        ***      Events             ***
+        *******************************
+    */
+    event ParticipantJoined(string roomId, address participant, Track[] initialTracks, string sdpOffer);
     event ParticipantLeft(string roomId, address participant);
     event TrackAdded(string roomId, address participant, string trackName);
     event EventForwardedToBackend(string roomId, address sender, bytes eventData);
     event EventForwardedToFrontend(string roomId, address participant, bytes eventData);
-
+    event RoomCreated(string roomId);
+    event SetParticipantSessionID(string roomId, address participant, string sessionID);
+    /*
+        *******************************
+        ***      Constructor        ***
+        *******************************
+    */
     // Constructor
+
     constructor() {
         owner = msg.sender;
         authorizedBackends.push(msg.sender); // Owner is authorized by default
     }
+    /*
+        *******************************
+        ***     Modifiers           ***
+        *******************************
+    */
 
     // Modifiers
     modifier onlyOwner() {
@@ -78,22 +110,23 @@ contract DAppMeeting {
         _;
     }
 
+    /*
+        *******************************
+        ***      Functions          ***
+        *******************************
+    */
+
     function addAuthorized() public {
-        addAuthorizedBackend(msg.sender);
+        authorizedBackends.push(msg.sender);
     }
 
     function removeAuthorized() public {
-        removeAuthorizedBackend(msg.sender);
+        return _removeAuthorized(msg.sender);
     }
 
-    // Management functions
-    function addAuthorizedBackend(address _backend) public onlyOwner {
-        authorizedBackends.push(_backend);
-    }
-
-    function removeAuthorizedBackend(address _backend) public {
+    function _removeAuthorized(address _address) private {
         for (uint256 i = 0; i < authorizedBackends.length; i++) {
-            if (authorizedBackends[i] == _backend) {
+            if (authorizedBackends[i] == _address) {
                 // Swap with the last element and remove
                 authorizedBackends[i] = authorizedBackends[authorizedBackends.length - 1];
                 authorizedBackends.pop();
@@ -102,25 +135,60 @@ contract DAppMeeting {
         }
     }
 
+    function checkAuthorizedBackend(address _address) public view onlyOwner returns (bool) {
+        return _checkAuthorized(_address);
+    }
+
+    function _checkAuthorized(address _address) private view returns (bool) {
+        for (uint256 i = 0; i < authorizedBackends.length; i++) {
+            if (_address == authorizedBackends[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function checkAuthorized() public view returns (bool) {
+        return _checkAuthorized(msg.sender);
+    }
+
+    // Management functions
+    function addAuthorizedBackend(address _backend) public onlyOwner {
+        authorizedBackends.push(_backend);
+    }
+
+    function removeAuthorizedBackend(address _backend) public {
+        return _removeAuthorized(_backend);
+    }
+
     // Core functions
-    function createRoom(string memory _roomId) public {
+    function createRoom(string memory _roomId) public onlyAuthorized {
         require(bytes(rooms[_roomId].roomId).length == 0, "Room already exists");
 
         // Create a new room
         rooms[_roomId].roomId = _roomId;
         rooms[_roomId].creationTime = block.timestamp;
+        emit RoomCreated(_roomId);
+    }
+
+    function checkRoom(string memory _roomId) public view roomExists(_roomId) returns (bool) {
+        return true;
+    }
+
+    function deleteRoomBackend(string memory _roomId) public roomExists(_roomId) onlyOwner {
+        delete rooms[_roomId];
     }
 
     function joinRoom(
         string memory _roomId,
         string memory _name,
         Track[] memory _initialTracks,
-        string memory _sessionId
-    ) public roomExists(_roomId) {
+        string memory _sdp_offer
+    ) public onlyAuthorized roomExists(_roomId) {
         require(!participantsInRoom[_roomId][msg.sender], "Already in room");
 
         // Add participant to room
-        Participant memory newParticipant = Participant({walletAddress: msg.sender, name: _name, sessionID: _sessionId});
+        Participant memory newParticipant = Participant({walletAddress: msg.sender, name: _name, sessionID: ""});
 
         rooms[_roomId].participants.push(newParticipant);
         uint256 participantIndex = rooms[_roomId].participants.length - 1;
@@ -129,15 +197,12 @@ contract DAppMeeting {
 
         // Add initial tracks
         for (uint256 i = 0; i < _initialTracks.length; i++) {
-            Track memory track = _initialTracks[i];
-            track.sessionId = _sessionId;
-            participantTracks[_roomId][msg.sender].push(track);
+            participantTracks[_roomId][msg.sender].push(_initialTracks[i]);
             participantTrackCount[_roomId][msg.sender]++;
-            emit TrackAdded(_roomId, msg.sender, track.trackName);
         }
 
         // Emit the event for backend
-        emit ParticipantJoined(_roomId, msg.sender, _initialTracks);
+        emit ParticipantJoined(_roomId, msg.sender, _initialTracks, _sdp_offer);
     }
 
     function leaveRoom(string memory _roomId) public roomExists(_roomId) participantExists(_roomId) {
@@ -187,6 +252,21 @@ contract DAppMeeting {
 
         // Emit event
         emit ParticipantLeft(_roomId, _participant);
+    }
+
+    function setParticipantSessionID(string memory _roomId, address _participantAddress, string memory _sessionID)
+        public
+        roomExists(_roomId)
+        onlyOwner
+    {
+        require(participantsInRoom[_roomId][_participantAddress], "Participant not in room");
+        uint256 participantIndex = participantIndices[_roomId][_participantAddress];
+        rooms[_roomId].participants[participantIndex].sessionID = _sessionID;
+
+        for (uint256 i = 0; i < participantTrackCount[_roomId][_participantAddress]; i++) {
+            participantTracks[_roomId][_participantAddress][i].sessionId = _sessionID;
+        }
+        emit SetParticipantSessionID(_roomId, _participantAddress, _sessionID);
     }
 
     function addTrack(string memory _roomId, Track memory _newTrack)
@@ -250,5 +330,29 @@ contract DAppMeeting {
     {
         require(participantsInRoom[_roomId][_participant], "Participant not in room");
         return participantTrackCount[_roomId][_participant];
+    }
+
+    function getParticipantOfRoom(string memory _roomId)
+        public
+        view
+        roomExists(_roomId)
+        onlyOwner
+        returns (Participant[] memory, Track[] memory)
+    {
+        uint256 participantCount = getRoomParticipantsCount(_roomId);
+        uint256 trackSize = 0;
+        for (uint256 i = 0; i < participantCount; i++) {
+            trackSize += getParticipantTracksCount(_roomId, rooms[_roomId].participants[i].walletAddress);
+        }
+        Track[] memory tracks = new Track[](trackSize);
+        uint256 idx = 0;
+        for (uint256 i = 0; i < participantCount; i++) {
+            for (
+                uint256 j = 0; j < getParticipantTracksCount(_roomId, rooms[_roomId].participants[i].walletAddress); j++
+            ) {
+                tracks[idx++] = participantTracks[_roomId][rooms[_roomId].participants[i].walletAddress][j];
+            }
+        }
+        return (rooms[_roomId].participants, tracks);
     }
 }

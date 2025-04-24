@@ -1,0 +1,4 @@
+{
+    "codium.codeCompletion.enable": true,
+    "postman.settings.dotenv-detection-notification-visibility": false
+}
