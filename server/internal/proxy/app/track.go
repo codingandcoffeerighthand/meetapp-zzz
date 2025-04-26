@@ -7,6 +7,7 @@ import (
 	"proxy-srv/internal/proxy/domain"
 	"proxy-srv/pkg/gencode/cloudflare_client"
 	"proxy-srv/pkg/gencode/smc_gen"
+	"sync"
 )
 
 func (b *app) PublisbTrack(
@@ -17,7 +18,11 @@ func (b *app) PublisbTrack(
 	return *resp.SessionDescription.Sdp, err
 }
 
+var pullRoomMutex = sync.Mutex{}
+
 func (b *app) RoomPull(roomId string) error {
+	pullRoomMutex.Lock()
+	defer pullRoomMutex.Unlock()
 	smcResp, err := b.smc.GetParticipantsAndTracksOfRoom(roomId)
 	if err != nil {
 		return err
@@ -30,7 +35,10 @@ func (b *app) RoomPull(roomId string) error {
 		}
 	}()
 	for _, p := range ps {
-		b.PullTrack(roomId, p.WalletAddress.String(), p.SessionID, ps, track)
+		_, err := b.PullTrack(roomId, p.WalletAddress.String(), p.SessionID, ps, track)
+		if err != nil {
+			b.errChan <- err
+		}
 	}
 	return nil
 }
@@ -47,7 +55,7 @@ func (b *app) PullTrack(roomId string, pAddr string, sessionId string, ps []smc_
 	var remoteTracks = make([]cloudflare_client.TrackObject, 0)
 	var remoteLocalTrackValue = cloudflare_client.TrackObjectLocationRemote
 	for _, rTrack := range tracks {
-		if rTrack.SessionId == sessionId {
+		if rTrack.SessionId == sessionId || !rTrack.IsPublished {
 			continue
 		}
 		exist := false
@@ -75,10 +83,10 @@ func (b *app) PullTrack(roomId string, pAddr string, sessionId string, ps []smc_
 	if len(remoteTracks) > 0 {
 		resp, err := b.clf.AddRemoteTrack(context.Background(), remoteSession, remoteTracks)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("pullTrack err %v", err)
 		}
 		if !*resp.RequiresImmediateRenegotiation {
-			return "", nil
+			return "", fmt.Errorf("pullTrack err not sdp answer %v", err)
 		}
 		if resp.SessionDescription == nil {
 			return "", errors.New("no remote track")
@@ -100,13 +108,10 @@ func (b *app) PullTrack(roomId string, pAddr string, sessionId string, ps []smc_
 		}(roomId, pAddr)
 		return *resp.SessionDescription.Sdp, err
 	}
-	return "", fmt.Errorf("no remote track")
+	return "", nil
 }
 
 func (b *app) RenegatiateSession(ctx context.Context, session string, sdpAnswer string) error {
 	_, err := b.clf.RenegatiateSession(ctx, session, sdpAnswer)
-	if err != nil {
-		b.log.Error(err.Error())
-	}
 	return err
 }

@@ -34,9 +34,9 @@
         "internalType": "string"
       },
       {
-        "name": "_newTrack",
-        "type": "tuple",
-        "internalType": "struct DAppMeeting.Track",
+        "name": "_newTracks",
+        "type": "tuple[]",
+        "internalType": "struct DAppMeeting.Track[]",
         "components": [
           {
             "name": "trackName",
@@ -47,6 +47,11 @@
             "name": "mid",
             "type": "string",
             "internalType": "string"
+          },
+          {
+            "name": "streamNumber",
+            "type": "uint256",
+            "internalType": "uint256"
           },
           {
             "name": "location",
@@ -69,6 +74,11 @@
             "internalType": "string"
           }
         ]
+      },
+      {
+        "name": "sdpOffer",
+        "type": "string",
+        "internalType": "string"
       }
     ],
     "outputs": [],
@@ -108,81 +118,12 @@
   },
   {
     "type": "function",
-    "name": "checkAuthorizedBackend",
-    "inputs": [
-      {
-        "name": "_address",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "checkRoom",
-    "inputs": [
-      {
-        "name": "_roomId",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "createRoom",
     "inputs": [
       {
         "name": "_roomId",
         "type": "string",
         "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "deleteRoomBackend",
-    "inputs": [
-      {
-        "name": "_roomId",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "forceLeaveRoom",
-    "inputs": [
-      {
-        "name": "_roomId",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "_participant",
-        "type": "address",
-        "internalType": "address"
       }
     ],
     "outputs": [],
@@ -314,6 +255,11 @@
             "internalType": "string"
           },
           {
+            "name": "streamNumber",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
             "name": "location",
             "type": "string",
             "internalType": "string"
@@ -368,6 +314,11 @@
             "name": "mid",
             "type": "string",
             "internalType": "string"
+          },
+          {
+            "name": "streamNumber",
+            "type": "uint256",
+            "internalType": "uint256"
           },
           {
             "name": "location",
@@ -465,6 +416,11 @@
             "name": "mid",
             "type": "string",
             "internalType": "string"
+          },
+          {
+            "name": "streamNumber",
+            "type": "uint256",
+            "internalType": "uint256"
           },
           {
             "name": "location",
@@ -603,6 +559,11 @@
         "internalType": "string"
       },
       {
+        "name": "streamNumber",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
         "name": "location",
         "type": "string",
         "internalType": "string"
@@ -651,19 +612,22 @@
   },
   {
     "type": "function",
-    "name": "removeAuthorized",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "removeAuthorizedBackend",
+    "name": "removeTrack",
     "inputs": [
       {
-        "name": "_backend",
-        "type": "address",
-        "internalType": "address"
+        "name": "_roomId",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "_mids",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "sdpOffer",
+        "type": "string",
+        "internalType": "string"
       }
     ],
     "outputs": [],
@@ -799,6 +763,11 @@
             "internalType": "string"
           },
           {
+            "name": "streamNumber",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
             "name": "location",
             "type": "string",
             "internalType": "string"
@@ -844,6 +813,74 @@
         "type": "address",
         "indexed": false,
         "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RemoveTracks",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "sessionId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "removedTracks",
+        "type": "tuple[]",
+        "indexed": false,
+        "internalType": "struct DAppMeeting.Track[]",
+        "components": [
+          {
+            "name": "trackName",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "mid",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "streamNumber",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "location",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "isPublished",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "sessionId",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "roomId",
+            "type": "string",
+            "internalType": "string"
+          }
+        ]
+      },
+      {
+        "name": "sdpOffer",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
       }
     ],
     "anonymous": false
@@ -903,7 +940,50 @@
         "internalType": "address"
       },
       {
-        "name": "trackName",
+        "name": "tracks",
+        "type": "tuple[]",
+        "indexed": false,
+        "internalType": "struct DAppMeeting.Track[]",
+        "components": [
+          {
+            "name": "trackName",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "mid",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "streamNumber",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "location",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "isPublished",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "sessionId",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "roomId",
+            "type": "string",
+            "internalType": "string"
+          }
+        ]
+      },
+      {
+        "name": "sdpOffer",
         "type": "string",
         "indexed": false,
         "internalType": "string"

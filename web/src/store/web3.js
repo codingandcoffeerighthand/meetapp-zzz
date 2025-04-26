@@ -155,33 +155,33 @@ const useWeb3Store = create(
                 set({ isLoading: false })
             }
         },
-        joinRoom: async (stream, roomId, participantName, localPeerConnection) => {
+        addLocalTrack: async (stream, roomId) => {
             set({ isLoading: true })
-
-            const { account, contract } = get()
             try {
+                const { localPeerConnection, contract, account } = get()
+                if (!localPeerConnection) {
+                    throw new Error("Local peer connection not initialized")
+                }
                 const transceivers = stream.getTracks().map(
                     track => localPeerConnection?.addTransceiver(track, {
                         direction: "sendonly"
                     })
                 )
-                const offer = await localPeerConnection?.createOffer()
-                await localPeerConnection.setLocalDescription(offer)
-                // base64
-                const offerStr = btoa(offer?.sdp)
-
                 /*
                     format [trackId, mid, "local, true, "", roomid]
                 */
                 const tracks = transceivers.map(({ mid, sender }) => ([
                     sender?.track?.id, mid, "local", true, "", roomId
                 ]))
-                await contract.methods.joinRoom(roomId, participantName, tracks, offerStr).send({ from: account })
-
-            } catch (err) {
-                console.error(err)
-                set({ err })
-            } finally {
+                console.info(roomId, tracks[0])
+                await contract.methods.addTrack(roomId, tracks[0]).send({ from: account })
+                const data = Web3.utils.toHex({
+                    event_name: "local_peer_connection_suscess"
+                })
+                await contract.methods.forwardEventToBackend(roomId, data).send({ from: account })
+            }
+            catch (err) { console.error(err) }
+            finally {
                 set({ isLoading: false })
             }
         },
@@ -236,6 +236,7 @@ const useWeb3Store = create(
         //  localPeerConnection
         localPeerConnection: null,
         localStreams: [],
+        localStreamNumber: 0,
         startStream: async (roomId, participantName = "") => {
             set({ isLoading: true })
             const { contract, account, localStreams } = get()
@@ -274,9 +275,11 @@ const useWeb3Store = create(
                 /*
                     format [trackId, mid, "local, true, "", roomid]
                 */
+                const { localStreamNumber } = get()
                 const tracks = transceivers.map(({ mid, sender }) => ([
-                    sender?.track?.id, mid, "local", true, "", roomId
+                    sender?.track?.id, mid, localStreamNumber, "local", true, "", roomId
                 ]))
+                set({ localStreamNumber: localStreamNumber + 1 })
                 // debugger
                 await contract.methods.joinRoom(roomId, participantName, tracks, offerStr).send({ from: account })
                 set({ localPeerConnection, localStreams: [...localStreams, stream] })
@@ -296,7 +299,6 @@ const useWeb3Store = create(
                     new RTCSessionDescription({ sdp: sdpAnswer, type: "answer" }),
                 );
                 await waitLocalConnection(localPeerConnection)
-
                 const data = Web3.utils.toHex({
                     event_name: "local_peer_connection_suscess"
                 })
@@ -328,8 +330,48 @@ const useWeb3Store = create(
                     }
                 })
                 await contract.methods.forwardEventToBackend(roomId, data).send({ from: account })
+                const { getRoomTracks } = get()
+                await getRoomTracks(roomId)
+
             } catch (err) {
                 console.error(err)
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+
+        getRoomTracks: async (roomId) => {
+            set({ isLoading: true })
+            try {
+                const { contract, account } = get()
+                const data = await contract.methods.getParticipantOfRoom(roomId).call({
+                    from: account
+                })
+                const ps = data[0]
+                const tracks = data[1]
+                const mapParticipants = {}
+                ps.forEach((p) => {
+                    const session = p?.sessionID
+                    if (session) {
+                        mapParticipants[session] = {}
+                        mapParticipants[session].name = p?.name
+                        mapParticipants[session].address = p?.walletAddress
+                    }
+                })
+                tracks.forEach(t => {
+                    const s = t?.sessionId
+                    const n = t?.trackName
+                    if (s && n) {
+                        if (mapParticipants[s]) {
+                            mapParticipants[s][n] = t
+                        }
+                    }
+
+                })
+                console.info(mapParticipants)
+            } catch (err) {
+                console.error('Error getting room tracks:', err)
+                set({ error: err })
             } finally {
                 set({ isLoading: false })
             }

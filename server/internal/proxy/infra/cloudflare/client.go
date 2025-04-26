@@ -76,9 +76,14 @@ func (c *cloudFlareInfa) AddLocalTrack(ctx context.Context, sessionId string, sd
 	}
 	return *resp.JSON200, err
 }
+
+var addRemoteTrack = sync.Mutex{}
+
 func (c *cloudFlareInfa) AddRemoteTrack(ctx context.Context, sessionId string, tracks []cloudflare_client.TrackObject) (
 	cloudflare_client.TracksResponse, error,
 ) {
+	addRemoteTrack.Lock()
+	defer addRemoteTrack.Unlock()
 	remoteVal := cloudflare_client.TrackObjectLocationRemote
 	for i := range tracks {
 		tracks[i].Location = &remoteVal
@@ -105,8 +110,6 @@ func (c *cloudFlareInfa) RenegatiateSession(ctx context.Context, session string,
 		Sdp:  &sdpAnswer,
 		Type: &answerType,
 	}
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
 	resp, err := c.PutAppsAppIdSessionsSessionIdRenegotiateWithResponse(
 		ctx, c.appId, session,
 		cloudflare_client.PutAppsAppIdSessionsSessionIdRenegotiateJSONRequestBody{

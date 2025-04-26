@@ -33,17 +33,18 @@ type DAppMeetingParticipant struct {
 
 // DAppMeetingTrack is an auto generated low-level Go binding around an user-defined struct.
 type DAppMeetingTrack struct {
-	TrackName   string
-	Mid         string
-	Location    string
-	IsPublished bool
-	SessionId   string
-	RoomId      string
+	TrackName    string
+	Mid          string
+	StreamNumber *big.Int
+	Location     string
+	IsPublished  bool
+	SessionId    string
+	RoomId       string
 }
 
 // MeeetingMetaData contains all meta data concerning the Meeeting contract.
 var MeeetingMetaData = bind.MetaData{
-	ABI: "[{\"type\":\"constructor\",\"inputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"addAuthorized\",\"inputs\":[],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"addAuthorizedBackend\",\"inputs\":[{\"name\":\"_backend\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"addTrack\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_newTrack\",\"type\":\"tuple\",\"internalType\":\"structDAppMeeting.Track\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"authorizedBackends\",\"inputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"checkAuthorized\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"bool\",\"internalType\":\"bool\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"checkAuthorizedBackend\",\"inputs\":[{\"name\":\"_address\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bool\",\"internalType\":\"bool\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"checkRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bool\",\"internalType\":\"bool\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"createRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"deleteRoomBackend\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"forceLeaveRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participant\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"forwardEventToBackend\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_eventData\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"forwardEventToFrontend\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participant\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"_eventData\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"getParticipantInfo\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple\",\"internalType\":\"structDAppMeeting.Participant\",\"components\":[{\"name\":\"walletAddress\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"name\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"sessionID\",\"type\":\"string\",\"internalType\":\"string\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getParticipantOfRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Participant[]\",\"components\":[{\"name\":\"walletAddress\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"name\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"sessionID\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getParticipantTracks\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participant\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getParticipantTracksCount\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participant\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getRoomParticipantsCount\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"joinRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_name\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_initialTracks\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"_sdp_offer\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"leaveRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"owner\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"participantIndices\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"participantTrackCount\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"participantTracks\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"participantsInRoom\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bool\",\"internalType\":\"bool\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"removeAuthorized\",\"inputs\":[],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"removeAuthorizedBackend\",\"inputs\":[{\"name\":\"_backend\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"rooms\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"creationTime\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"setParticipantSessionID\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participantAddress\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"_sessionID\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"event\",\"name\":\"EventForwardedToBackend\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"sender\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"eventData\",\"type\":\"bytes\",\"indexed\":false,\"internalType\":\"bytes\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"EventForwardedToFrontend\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"eventData\",\"type\":\"bytes\",\"indexed\":false,\"internalType\":\"bytes\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ParticipantJoined\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"initialTracks\",\"type\":\"tuple[]\",\"indexed\":false,\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"sdpOffer\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ParticipantLeft\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"RoomCreated\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetParticipantSessionID\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"sessionID\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"TrackAdded\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"trackName\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false}]",
+	ABI: "[{\"type\":\"constructor\",\"inputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"addAuthorized\",\"inputs\":[],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"addAuthorizedBackend\",\"inputs\":[{\"name\":\"_backend\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"addTrack\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_newTracks\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"streamNumber\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"sdpOffer\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"authorizedBackends\",\"inputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"checkAuthorized\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"bool\",\"internalType\":\"bool\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"createRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"forwardEventToBackend\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_eventData\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"forwardEventToFrontend\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participant\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"_eventData\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"getParticipantInfo\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple\",\"internalType\":\"structDAppMeeting.Participant\",\"components\":[{\"name\":\"walletAddress\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"name\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"sessionID\",\"type\":\"string\",\"internalType\":\"string\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getParticipantOfRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Participant[]\",\"components\":[{\"name\":\"walletAddress\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"name\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"sessionID\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"streamNumber\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getParticipantTracks\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participant\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"streamNumber\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getParticipantTracksCount\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participant\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getRoomParticipantsCount\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"joinRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_name\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_initialTracks\",\"type\":\"tuple[]\",\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"streamNumber\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"_sdp_offer\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"leaveRoom\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"owner\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"participantIndices\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"participantTrackCount\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"participantTracks\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"streamNumber\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"participantsInRoom\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bool\",\"internalType\":\"bool\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"removeTrack\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_mids\",\"type\":\"string[]\",\"internalType\":\"string[]\"},{\"name\":\"sdpOffer\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"rooms\",\"inputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"creationTime\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"setParticipantSessionID\",\"inputs\":[{\"name\":\"_roomId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"_participantAddress\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"_sessionID\",\"type\":\"string\",\"internalType\":\"string\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"event\",\"name\":\"EventForwardedToBackend\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"sender\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"eventData\",\"type\":\"bytes\",\"indexed\":false,\"internalType\":\"bytes\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"EventForwardedToFrontend\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"eventData\",\"type\":\"bytes\",\"indexed\":false,\"internalType\":\"bytes\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ParticipantJoined\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"initialTracks\",\"type\":\"tuple[]\",\"indexed\":false,\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"streamNumber\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"sdpOffer\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ParticipantLeft\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"RemoveTracks\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"sessionId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"removedTracks\",\"type\":\"tuple[]\",\"indexed\":false,\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"streamNumber\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"sdpOffer\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"RoomCreated\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetParticipantSessionID\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"sessionID\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"TrackAdded\",\"inputs\":[{\"name\":\"roomId\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"},{\"name\":\"participant\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"tracks\",\"type\":\"tuple[]\",\"indexed\":false,\"internalType\":\"structDAppMeeting.Track[]\",\"components\":[{\"name\":\"trackName\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"mid\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"streamNumber\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"location\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"isPublished\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"sessionId\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"roomId\",\"type\":\"string\",\"internalType\":\"string\"}]},{\"name\":\"sdpOffer\",\"type\":\"string\",\"indexed\":false,\"internalType\":\"string\"}],\"anonymous\":false}]",
 	ID:  "Meeeting",
 }
 
@@ -92,11 +93,11 @@ func (meeeting *Meeeting) PackAddAuthorizedBackend(backend common.Address) []byt
 }
 
 // PackAddTrack is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x3b4ddda8.
+// the contract method with ID 0x1799b89e.
 //
-// Solidity: function addTrack(string _roomId, (string,string,string,bool,string,string) _newTrack) returns()
-func (meeeting *Meeeting) PackAddTrack(roomId string, newTrack DAppMeetingTrack) []byte {
-	enc, err := meeeting.abi.Pack("addTrack", roomId, newTrack)
+// Solidity: function addTrack(string _roomId, (string,string,uint256,string,bool,string,string)[] _newTracks, string sdpOffer) returns()
+func (meeeting *Meeeting) PackAddTrack(roomId string, newTracks []DAppMeetingTrack, sdpOffer string) []byte {
+	enc, err := meeeting.abi.Pack("addTrack", roomId, newTracks, sdpOffer)
 	if err != nil {
 		panic(err)
 	}
@@ -153,86 +154,12 @@ func (meeeting *Meeeting) UnpackCheckAuthorized(data []byte) (bool, error) {
 	return out0, err
 }
 
-// PackCheckAuthorizedBackend is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x3fa55fea.
-//
-// Solidity: function checkAuthorizedBackend(address _address) view returns(bool)
-func (meeeting *Meeeting) PackCheckAuthorizedBackend(address common.Address) []byte {
-	enc, err := meeeting.abi.Pack("checkAuthorizedBackend", address)
-	if err != nil {
-		panic(err)
-	}
-	return enc
-}
-
-// UnpackCheckAuthorizedBackend is the Go binding that unpacks the parameters returned
-// from invoking the contract method with ID 0x3fa55fea.
-//
-// Solidity: function checkAuthorizedBackend(address _address) view returns(bool)
-func (meeeting *Meeeting) UnpackCheckAuthorizedBackend(data []byte) (bool, error) {
-	out, err := meeeting.abi.Unpack("checkAuthorizedBackend", data)
-	if err != nil {
-		return *new(bool), err
-	}
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
-}
-
-// PackCheckRoom is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xa02af0e2.
-//
-// Solidity: function checkRoom(string _roomId) view returns(bool)
-func (meeeting *Meeeting) PackCheckRoom(roomId string) []byte {
-	enc, err := meeeting.abi.Pack("checkRoom", roomId)
-	if err != nil {
-		panic(err)
-	}
-	return enc
-}
-
-// UnpackCheckRoom is the Go binding that unpacks the parameters returned
-// from invoking the contract method with ID 0xa02af0e2.
-//
-// Solidity: function checkRoom(string _roomId) view returns(bool)
-func (meeeting *Meeeting) UnpackCheckRoom(data []byte) (bool, error) {
-	out, err := meeeting.abi.Unpack("checkRoom", data)
-	if err != nil {
-		return *new(bool), err
-	}
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
-}
-
 // PackCreateRoom is the Go binding used to pack the parameters required for calling
 // the contract method with ID 0x7306d2dd.
 //
 // Solidity: function createRoom(string _roomId) returns()
 func (meeeting *Meeeting) PackCreateRoom(roomId string) []byte {
 	enc, err := meeeting.abi.Pack("createRoom", roomId)
-	if err != nil {
-		panic(err)
-	}
-	return enc
-}
-
-// PackDeleteRoomBackend is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x94e9c26d.
-//
-// Solidity: function deleteRoomBackend(string _roomId) returns()
-func (meeeting *Meeeting) PackDeleteRoomBackend(roomId string) []byte {
-	enc, err := meeeting.abi.Pack("deleteRoomBackend", roomId)
-	if err != nil {
-		panic(err)
-	}
-	return enc
-}
-
-// PackForceLeaveRoom is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x209fc017.
-//
-// Solidity: function forceLeaveRoom(string _roomId, address _participant) returns()
-func (meeeting *Meeeting) PackForceLeaveRoom(roomId string, participant common.Address) []byte {
-	enc, err := meeeting.abi.Pack("forceLeaveRoom", roomId, participant)
 	if err != nil {
 		panic(err)
 	}
@@ -291,7 +218,7 @@ func (meeeting *Meeeting) UnpackGetParticipantInfo(data []byte) (DAppMeetingPart
 // PackGetParticipantOfRoom is the Go binding used to pack the parameters required for calling
 // the contract method with ID 0x23c3cfbe.
 //
-// Solidity: function getParticipantOfRoom(string _roomId) view returns((address,string,string)[], (string,string,string,bool,string,string)[])
+// Solidity: function getParticipantOfRoom(string _roomId) view returns((address,string,string)[], (string,string,uint256,string,bool,string,string)[])
 func (meeeting *Meeeting) PackGetParticipantOfRoom(roomId string) []byte {
 	enc, err := meeeting.abi.Pack("getParticipantOfRoom", roomId)
 	if err != nil {
@@ -310,7 +237,7 @@ type GetParticipantOfRoomOutput struct {
 // UnpackGetParticipantOfRoom is the Go binding that unpacks the parameters returned
 // from invoking the contract method with ID 0x23c3cfbe.
 //
-// Solidity: function getParticipantOfRoom(string _roomId) view returns((address,string,string)[], (string,string,string,bool,string,string)[])
+// Solidity: function getParticipantOfRoom(string _roomId) view returns((address,string,string)[], (string,string,uint256,string,bool,string,string)[])
 func (meeeting *Meeeting) UnpackGetParticipantOfRoom(data []byte) (GetParticipantOfRoomOutput, error) {
 	out, err := meeeting.abi.Unpack("getParticipantOfRoom", data)
 	outstruct := new(GetParticipantOfRoomOutput)
@@ -326,7 +253,7 @@ func (meeeting *Meeeting) UnpackGetParticipantOfRoom(data []byte) (GetParticipan
 // PackGetParticipantTracks is the Go binding used to pack the parameters required for calling
 // the contract method with ID 0xc3241b95.
 //
-// Solidity: function getParticipantTracks(string _roomId, address _participant) view returns((string,string,string,bool,string,string)[])
+// Solidity: function getParticipantTracks(string _roomId, address _participant) view returns((string,string,uint256,string,bool,string,string)[])
 func (meeeting *Meeeting) PackGetParticipantTracks(roomId string, participant common.Address) []byte {
 	enc, err := meeeting.abi.Pack("getParticipantTracks", roomId, participant)
 	if err != nil {
@@ -338,7 +265,7 @@ func (meeeting *Meeeting) PackGetParticipantTracks(roomId string, participant co
 // UnpackGetParticipantTracks is the Go binding that unpacks the parameters returned
 // from invoking the contract method with ID 0xc3241b95.
 //
-// Solidity: function getParticipantTracks(string _roomId, address _participant) view returns((string,string,string,bool,string,string)[])
+// Solidity: function getParticipantTracks(string _roomId, address _participant) view returns((string,string,uint256,string,bool,string,string)[])
 func (meeeting *Meeeting) UnpackGetParticipantTracks(data []byte) ([]DAppMeetingTrack, error) {
 	out, err := meeeting.abi.Unpack("getParticipantTracks", data)
 	if err != nil {
@@ -399,9 +326,9 @@ func (meeeting *Meeeting) UnpackGetRoomParticipantsCount(data []byte) (*big.Int,
 }
 
 // PackJoinRoom is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xe82a5259.
+// the contract method with ID 0x7fff4dbf.
 //
-// Solidity: function joinRoom(string _roomId, string _name, (string,string,string,bool,string,string)[] _initialTracks, string _sdp_offer) returns()
+// Solidity: function joinRoom(string _roomId, string _name, (string,string,uint256,string,bool,string,string)[] _initialTracks, string _sdp_offer) returns()
 func (meeeting *Meeeting) PackJoinRoom(roomId string, name string, initialTracks []DAppMeetingTrack, sdpOffer string) []byte {
 	enc, err := meeeting.abi.Pack("joinRoom", roomId, name, initialTracks, sdpOffer)
 	if err != nil {
@@ -500,7 +427,7 @@ func (meeeting *Meeeting) UnpackParticipantTrackCount(data []byte) (*big.Int, er
 // PackParticipantTracks is the Go binding used to pack the parameters required for calling
 // the contract method with ID 0x5b85facc.
 //
-// Solidity: function participantTracks(string , address , uint256 ) view returns(string trackName, string mid, string location, bool isPublished, string sessionId, string roomId)
+// Solidity: function participantTracks(string , address , uint256 ) view returns(string trackName, string mid, uint256 streamNumber, string location, bool isPublished, string sessionId, string roomId)
 func (meeeting *Meeeting) PackParticipantTracks(arg0 string, arg1 common.Address, arg2 *big.Int) []byte {
 	enc, err := meeeting.abi.Pack("participantTracks", arg0, arg1, arg2)
 	if err != nil {
@@ -512,18 +439,19 @@ func (meeeting *Meeeting) PackParticipantTracks(arg0 string, arg1 common.Address
 // ParticipantTracksOutput serves as a container for the return parameters of contract
 // method ParticipantTracks.
 type ParticipantTracksOutput struct {
-	TrackName   string
-	Mid         string
-	Location    string
-	IsPublished bool
-	SessionId   string
-	RoomId      string
+	TrackName    string
+	Mid          string
+	StreamNumber *big.Int
+	Location     string
+	IsPublished  bool
+	SessionId    string
+	RoomId       string
 }
 
 // UnpackParticipantTracks is the Go binding that unpacks the parameters returned
 // from invoking the contract method with ID 0x5b85facc.
 //
-// Solidity: function participantTracks(string , address , uint256 ) view returns(string trackName, string mid, string location, bool isPublished, string sessionId, string roomId)
+// Solidity: function participantTracks(string , address , uint256 ) view returns(string trackName, string mid, uint256 streamNumber, string location, bool isPublished, string sessionId, string roomId)
 func (meeeting *Meeeting) UnpackParticipantTracks(data []byte) (ParticipantTracksOutput, error) {
 	out, err := meeeting.abi.Unpack("participantTracks", data)
 	outstruct := new(ParticipantTracksOutput)
@@ -532,10 +460,11 @@ func (meeeting *Meeeting) UnpackParticipantTracks(data []byte) (ParticipantTrack
 	}
 	outstruct.TrackName = *abi.ConvertType(out[0], new(string)).(*string)
 	outstruct.Mid = *abi.ConvertType(out[1], new(string)).(*string)
-	outstruct.Location = *abi.ConvertType(out[2], new(string)).(*string)
-	outstruct.IsPublished = *abi.ConvertType(out[3], new(bool)).(*bool)
-	outstruct.SessionId = *abi.ConvertType(out[4], new(string)).(*string)
-	outstruct.RoomId = *abi.ConvertType(out[5], new(string)).(*string)
+	outstruct.StreamNumber = abi.ConvertType(out[2], new(big.Int)).(*big.Int)
+	outstruct.Location = *abi.ConvertType(out[3], new(string)).(*string)
+	outstruct.IsPublished = *abi.ConvertType(out[4], new(bool)).(*bool)
+	outstruct.SessionId = *abi.ConvertType(out[5], new(string)).(*string)
+	outstruct.RoomId = *abi.ConvertType(out[6], new(string)).(*string)
 	return *outstruct, err
 
 }
@@ -565,24 +494,12 @@ func (meeeting *Meeeting) UnpackParticipantsInRoom(data []byte) (bool, error) {
 	return out0, err
 }
 
-// PackRemoveAuthorized is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x061e1fc9.
+// PackRemoveTrack is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x929243b0.
 //
-// Solidity: function removeAuthorized() returns()
-func (meeeting *Meeeting) PackRemoveAuthorized() []byte {
-	enc, err := meeeting.abi.Pack("removeAuthorized")
-	if err != nil {
-		panic(err)
-	}
-	return enc
-}
-
-// PackRemoveAuthorizedBackend is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x9ba78fd9.
-//
-// Solidity: function removeAuthorizedBackend(address _backend) returns()
-func (meeeting *Meeeting) PackRemoveAuthorizedBackend(backend common.Address) []byte {
-	enc, err := meeeting.abi.Pack("removeAuthorizedBackend", backend)
+// Solidity: function removeTrack(string _roomId, string[] _mids, string sdpOffer) returns()
+func (meeeting *Meeeting) PackRemoveTrack(roomId string, mids []string, sdpOffer string) []byte {
+	enc, err := meeeting.abi.Pack("removeTrack", roomId, mids, sdpOffer)
 	if err != nil {
 		panic(err)
 	}
@@ -697,7 +614,7 @@ func (MeeetingEventForwardedToFrontend) ContractEventName() string {
 // UnpackEventForwardedToFrontendEvent is the Go binding that unpacks the event data emitted
 // by contract.
 //
-// Solidity: event EventForwardedToFrontend(string roomId, address participant, bytes eventData)
+// Solidity: event EventForwardedToFrontend(string roomId, address indexed participant, bytes eventData)
 func (meeeting *Meeeting) UnpackEventForwardedToFrontendEvent(log *types.Log) (*MeeetingEventForwardedToFrontend, error) {
 	event := "EventForwardedToFrontend"
 	if log.Topics[0] != meeeting.abi.Events[event].ID {
@@ -741,7 +658,7 @@ func (MeeetingParticipantJoined) ContractEventName() string {
 // UnpackParticipantJoinedEvent is the Go binding that unpacks the event data emitted
 // by contract.
 //
-// Solidity: event ParticipantJoined(string roomId, address participant, (string,string,string,bool,string,string)[] initialTracks, string sdpOffer)
+// Solidity: event ParticipantJoined(string roomId, address participant, (string,string,uint256,string,bool,string,string)[] initialTracks, string sdpOffer)
 func (meeeting *Meeeting) UnpackParticipantJoinedEvent(log *types.Log) (*MeeetingParticipantJoined, error) {
 	event := "ParticipantJoined"
 	if log.Topics[0] != meeeting.abi.Events[event].ID {
@@ -790,6 +707,50 @@ func (meeeting *Meeeting) UnpackParticipantLeftEvent(log *types.Log) (*MeeetingP
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(MeeetingParticipantLeft)
+	if len(log.Data) > 0 {
+		if err := meeeting.abi.UnpackIntoInterface(out, event, log.Data); err != nil {
+			return nil, err
+		}
+	}
+	var indexed abi.Arguments
+	for _, arg := range meeeting.abi.Events[event].Inputs {
+		if arg.Indexed {
+			indexed = append(indexed, arg)
+		}
+	}
+	if err := abi.ParseTopics(out, indexed, log.Topics[1:]); err != nil {
+		return nil, err
+	}
+	out.Raw = log
+	return out, nil
+}
+
+// MeeetingRemoveTracks represents a RemoveTracks event raised by the Meeeting contract.
+type MeeetingRemoveTracks struct {
+	RoomId        string
+	SessionId     string
+	RemovedTracks []DAppMeetingTrack
+	SdpOffer      string
+	Raw           *types.Log // Blockchain specific contextual infos
+}
+
+const MeeetingRemoveTracksEventName = "RemoveTracks"
+
+// ContractEventName returns the user-defined event name.
+func (MeeetingRemoveTracks) ContractEventName() string {
+	return MeeetingRemoveTracksEventName
+}
+
+// UnpackRemoveTracksEvent is the Go binding that unpacks the event data emitted
+// by contract.
+//
+// Solidity: event RemoveTracks(string roomId, string sessionId, (string,string,uint256,string,bool,string,string)[] removedTracks, string sdpOffer)
+func (meeeting *Meeeting) UnpackRemoveTracksEvent(log *types.Log) (*MeeetingRemoveTracks, error) {
+	event := "RemoveTracks"
+	if log.Topics[0] != meeeting.abi.Events[event].ID {
+		return nil, errors.New("event signature mismatch")
+	}
+	out := new(MeeetingRemoveTracks)
 	if len(log.Data) > 0 {
 		if err := meeeting.abi.UnpackIntoInterface(out, event, log.Data); err != nil {
 			return nil, err
@@ -896,7 +857,8 @@ func (meeeting *Meeeting) UnpackSetParticipantSessionIDEvent(log *types.Log) (*M
 type MeeetingTrackAdded struct {
 	RoomId      string
 	Participant common.Address
-	TrackName   string
+	Tracks      []DAppMeetingTrack
+	SdpOffer    string
 	Raw         *types.Log // Blockchain specific contextual infos
 }
 
@@ -910,7 +872,7 @@ func (MeeetingTrackAdded) ContractEventName() string {
 // UnpackTrackAddedEvent is the Go binding that unpacks the event data emitted
 // by contract.
 //
-// Solidity: event TrackAdded(string roomId, address participant, string trackName)
+// Solidity: event TrackAdded(string roomId, address participant, (string,string,uint256,string,bool,string,string)[] tracks, string sdpOffer)
 func (meeeting *Meeeting) UnpackTrackAddedEvent(log *types.Log) (*MeeetingTrackAdded, error) {
 	event := "TrackAdded"
 	if log.Topics[0] != meeeting.abi.Events[event].ID {

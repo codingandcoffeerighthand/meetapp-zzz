@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Script.sol";
 import "../src/meeting.sol";
+import "../src/StringCompareLib.sol";
 
 contract DeployMeeting is Script {
     function run() public {

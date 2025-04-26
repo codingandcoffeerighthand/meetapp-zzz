@@ -1,6 +1,6 @@
 export const waitLocalConnection = (localPeerConnection) => new Promise((res, rej) => {
     // timeout after 5s
-    setTimeout(rej, 5000);
+    setTimeout(rej, 60000);
     const iceConnectionStateChangeHandler = () => {
         if (localPeerConnection.iceConnectionState === "connected") {
             localPeerConnection.removeEventListener(

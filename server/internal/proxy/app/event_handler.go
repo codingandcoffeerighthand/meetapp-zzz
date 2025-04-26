@@ -8,6 +8,7 @@ import (
 	"proxy-srv/internal/proxy/domain"
 	"proxy-srv/pkg/gencode/cloudflare_client"
 	"proxy-srv/pkg/gencode/smc_gen"
+	"time"
 )
 
 /*
@@ -86,9 +87,10 @@ func (b *app) EventForwardBackendHandler(evt *smc_gen.MeeetingEventForwardedToBa
 	}()
 	switch evtData.EventName {
 	case domain.EventLocalPeerConnectionSuccess:
+		time.Sleep(3 * time.Second)
 		err := b.RoomPull(evt.RoomId)
 		if err != nil {
-			b.errChan <- fmt.Errorf("room pull %v", err)
+			b.errChan <- fmt.Errorf("local peer connection susses handle err %v", err)
 		}
 	case domain.EventRenegoiateSession:
 		if evtData.Data == nil {
@@ -108,7 +110,7 @@ func (b *app) EventForwardBackendHandler(evt *smc_gen.MeeetingEventForwardedToBa
 		go func() {
 			err := b.RenegatiateSession(context.Background(), remote_session, sdpAnswer)
 			if err != nil {
-				b.errChan <- fmt.Errorf("room pull %v", err)
+				b.errChan <- fmt.Errorf("renegoiate error %v", err)
 			}
 		}()
 

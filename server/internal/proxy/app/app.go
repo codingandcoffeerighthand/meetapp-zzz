@@ -20,7 +20,6 @@ type CloudFlareInfra interface {
 }
 
 type SMCInfra interface {
-	CheckAuthorized(addressStr string) (bool, error)
 	SubCreateRoomEvent(ctx context.Context) (<-chan *smc_gen.MeeetingRoomCreated, event.Subscription, error)
 	SetParticipantSessionID(ctx context.Context, room_id string, addr string, session_id string) error
 	SubJoinRoomEvent(ctx context.Context) (<-chan *smc_gen.MeeetingParticipantJoined, event.Subscription, error)
@@ -88,7 +87,9 @@ func (b *app) Run(ctx context.Context) (func(), error) {
 
 	go func() {
 		for err := range b.errChan {
-			b.log.Error(err.Error())
+			if err != nil {
+				b.log.Error(err.Error())
+			}
 		}
 	}()
 

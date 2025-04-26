@@ -53,15 +53,6 @@ func NewSMCInfra(cfg *configs.Config) (*smcInfra, error) {
 	}, nil
 }
 
-func (s *smcInfra) CheckAuthorized(addressStr string) (bool, error) {
-	address := common.HexToAddress(addressStr)
-	callOpts := &bind.CallOpts{
-		Pending: true,
-		From:    s.auth.From,
-	}
-	return bind.Call(s.BoundContract, callOpts, s.contract.PackCheckAuthorizedBackend(address), s.contract.UnpackCheckAuthorizedBackend)
-}
-
 var block *uint64 = nil
 
 func (s *smcInfra) SetParticipantSessionID(

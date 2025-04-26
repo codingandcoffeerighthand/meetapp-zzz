@@ -3,7 +3,7 @@ PRIVATE_KEY := ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 CHAINID = 31337
 
 deploy-contract:
-	forge build
+	forge build --sizes
 	forge script script/meeting.s.sol \
 		--rpc-url $(RPC) --private-key $(PRIVATE_KEY) --broadcast
 .PHONY: deploy-contract
