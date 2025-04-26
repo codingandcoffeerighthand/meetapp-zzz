@@ -1,12 +1,14 @@
 "use client"
-import { createStore, create } from 'zustand'
+import { create } from 'zustand'
 import Web3 from 'web3'
 import abi from '@/abi/abi.json'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { v4 } from 'uuid'
-import { useWebSocketStore } from './ws'
+import { createPeerConnection } from '@/utils/createPeerConnection'
+import { sleep, waitLocalConnection } from '@/utils/awaitConnected'
 const useWeb3Store = create(
     subscribeWithSelector((set, get) => ({
+        // web3
         web3: null,
         account: "",
         chainId: null,
@@ -17,12 +19,13 @@ const useWeb3Store = create(
         isAuthorized: false,
         roomId: "",
         prK: "",
+        evtHandlers: {},
+
         // Wallet and account
         initWeb3: async () => {
             if (typeof window !== "undefined") {
                 set({ isLoading: true, error: null })
                 try {
-                    console.info("init web3")
                     let web3Instance;
                     const provider = new Web3.providers.WebsocketProvider(process.env.NEXT_PUBLIC_INFURA_URL);
                     web3Instance = new Web3(provider);
@@ -58,7 +61,7 @@ const useWeb3Store = create(
         initContract: async () => {
             set({ isLoading: true })
             try {
-                const { web3, account, checkAuth } = get()
+                const { web3, account, checkAuth, listenContractEvts } = get()
                 if (!web3 || !account) {
                     set({ error: 'Web3 not initialized or no accounts found' })
                     return
@@ -142,7 +145,6 @@ const useWeb3Store = create(
                 }
                 await contract.methods.createRoom(roomId).send({ from: account })
                 set({ roomId })
-                console.info(roomId)
                 callback(roomId)
             }
             catch (err) {
@@ -153,16 +155,206 @@ const useWeb3Store = create(
                 set({ isLoading: false })
             }
         },
+        joinRoom: async (stream, roomId, participantName, localPeerConnection) => {
+            set({ isLoading: true })
+
+            const { account, contract } = get()
+            try {
+                const transceivers = stream.getTracks().map(
+                    track => localPeerConnection?.addTransceiver(track, {
+                        direction: "sendonly"
+                    })
+                )
+                const offer = await localPeerConnection?.createOffer()
+                await localPeerConnection.setLocalDescription(offer)
+                // base64
+                const offerStr = btoa(offer?.sdp)
+
+                /*
+                    format [trackId, mid, "local, true, "", roomid]
+                */
+                const tracks = transceivers.map(({ mid, sender }) => ([
+                    sender?.track?.id, mid, "local", true, "", roomId
+                ]))
+                await contract.methods.joinRoom(roomId, participantName, tracks, offerStr).send({ from: account })
+
+            } catch (err) {
+                console.error(err)
+                set({ err })
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+
+
+        setEvtHandler: (eventName, handleFunction) => {
+            set({
+                evtHandlers: {
+                    ...get().evtHandlers,
+                    [eventName]: handleFunction
+                }
+            })
+        },
+        evtSub: null,
+        listenContractEvts: (contract) => {
+            const { setSPDAnswerLocalPeerConnection, pullTrack } = get()
+            const { account: address, evtHandlers } = get()
+            const evtSub = contract.events.EventForwardedToFrontend({
+                filter: { participant: address },
+            }, (err, evt) => { console.info(err, evt) })
+            evtSub.on("data", data => {
+                // const json = JSON.parse(data)
+                const json = JSON.parse(Web3.utils.hexToUtf8(data.returnValues.eventData))
+                console.info(data)
+                console.info(json)
+                switch (json?.event_name) {
+                    case "joined_room":
+                        setSPDAnswerLocalPeerConnection(json.sdp_answer, data.returnValues.roomId)
+                        break
+                    case "pull_track":
+                        pullTrack(json.sdp_offer, json.remote_session, data.returnValues.roomId)
+                        break
+                    case "local_peer_connection_suscess":
+                        break
+                    case "new_participant_joined":
+                        break
+                    default:
+                        console.error("Unknown event", json.event_name)
+                }
+            })
+            evtSub.on("error", err => console.error(err))
+            console.info(evtSub)
+            set({ evtSub: evtSub })
+        },
+        startListen: () => {
+            const { contract, listenContractEvts } = get()
+            set({ localPeerConnection: null, remotePeerConnection: null, localStreams: [], remoteStreams: [] })
+            if (contract) {
+                listenContractEvts(contract)
+            }
+        },
+        //  localPeerConnection
+        localPeerConnection: null,
+        localStreams: [],
+        startStream: async (roomId, participantName = "") => {
+            set({ isLoading: true })
+            const { contract, account, localStreams } = get()
+            if (!participantName) {
+                participantName = account
+            }
+            try {
+                const localPeerConnection = await createPeerConnection()
+                const remotePeerConnection = await createPeerConnection()
+                remotePeerConnection.ontrack = (data) => {
+                    if (data.track) {
+                        const { remoteStreams } = get()
+                        const newStream = new MediaStream()
+
+                        newStream.addTrack(data.track)
+                        var streams = []
+                        if (remotePeerConnection) {
+                            streams = [...remoteStreams, newStream]
+                        }
+                        console.info(data)
+                        set({ remoteStreams: streams })
+                    }
+                }
+                set({ remotePeerConnection })
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                const transceivers = stream.getTracks().map(
+                    track => localPeerConnection?.addTransceiver(track, {
+                        direction: "sendonly"
+                    })
+                )
+                const offer = await localPeerConnection?.createOffer()
+                await localPeerConnection.setLocalDescription(offer)
+                // base64
+                const offerStr = btoa(offer?.sdp)
+
+                /*
+                    format [trackId, mid, "local, true, "", roomid]
+                */
+                const tracks = transceivers.map(({ mid, sender }) => ([
+                    sender?.track?.id, mid, "local", true, "", roomId
+                ]))
+                // debugger
+                await contract.methods.joinRoom(roomId, participantName, tracks, offerStr).send({ from: account })
+                set({ localPeerConnection, localStreams: [...localStreams, stream] })
+                return stream
+
+            } catch (err) {
+                console.error(err)
+                set({ err })
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+        setSPDAnswerLocalPeerConnection: async (sdpAnswer, roomId = "") => {
+            const { contract, localPeerConnection, account } = get()
+            try {
+                await localPeerConnection.setRemoteDescription(
+                    new RTCSessionDescription({ sdp: sdpAnswer, type: "answer" }),
+                );
+                await waitLocalConnection(localPeerConnection)
+
+                const data = Web3.utils.toHex({
+                    event_name: "local_peer_connection_suscess"
+                })
+                await contract.methods.forwardEventToBackend(roomId, data).send({ from: account })
+            } catch (err) {
+                console.error(err)
+            }
+        },
+        // remotePeerConnection
+        remotePeerConnection: null,
+        remoteStreams: [],
+        remoteSession: "",
+        pullTrack: async (sdp_offer, remoteSession, roomId) => {
+            const { contract, remotePeerConnection, account } = get()
+            set({ isLoading: true })
+            try {
+                await remotePeerConnection.setRemoteDescription(
+                    new RTCSessionDescription({ sdp: sdp_offer, type: "offer" }),
+                );
+                const answer = await remotePeerConnection.createAnswer()
+                await remotePeerConnection.setLocalDescription(answer)
+                // base64
+                const answerStr = btoa(answer?.sdp)
+                const data = Web3.utils.toHex({
+                    event_name: "renegoiate_session",
+                    data: {
+                        remote_session: remoteSession,
+                        sdp_answer: answerStr
+                    }
+                })
+                await contract.methods.forwardEventToBackend(roomId, data).send({ from: account })
+            } catch (err) {
+                console.error(err)
+            } finally {
+                set({ isLoading: false })
+            }
+        }
     })))
 
+
 useWeb3Store.subscribe(
-    state => state.prK,
-    async (acc) => {       // Callback receives the new value of `account`
-        console.log("khoi tao contract")
-        await useWeb3Store.getState().initContract()
-        useWebSocketStore.getState().init(acc)
+    (state) => state.account,
+    (account) => {
+        if (account) {
+            useWeb3Store.getState().initContract()
+        }
     }
 )
+useWeb3Store.subscribe(
+    (state) => state.contract,
+    (account) => {
+        if (account) {
+            useWeb3Store.getState().startListen()
+        }
+    }
+)
+
+
 await useWeb3Store.getState().initWeb3()
 
 export {

@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"proxy-srv/internal/proxy/configs"
 	"proxy-srv/pkg/gencode/cloudflare_client"
+	"sync"
 )
 
 type cloudFlareInfa struct {
 	cloudflare_client.ClientWithResponsesInterface
 	appId string
+	sync.Mutex
 }
 
 func NewClient(cfg configs.Config) (*cloudFlareInfa, error) {
@@ -30,6 +32,7 @@ func NewClient(cfg configs.Config) (*cloudFlareInfa, error) {
 	return &cloudFlareInfa{
 		ClientWithResponsesInterface: cl,
 		appId:                        cfg.CloudflareConfig.AppId,
+		Mutex:                        sync.Mutex{},
 	}, nil
 }
 
@@ -68,6 +71,9 @@ func (c *cloudFlareInfa) AddLocalTrack(ctx context.Context, sessionId string, sd
 	if resp == nil {
 		return cloudflare_client.TracksResponse{}, errors.New("error passing JSON response for add local track")
 	}
+	if resp.JSON200 == nil {
+		return cloudflare_client.TracksResponse{}, fmt.Errorf("cloudflare error %v", resp.HTTPResponse)
+	}
 	return *resp.JSON200, err
 }
 func (c *cloudFlareInfa) AddRemoteTrack(ctx context.Context, sessionId string, tracks []cloudflare_client.TrackObject) (
@@ -99,6 +105,8 @@ func (c *cloudFlareInfa) RenegatiateSession(ctx context.Context, session string,
 		Sdp:  &sdpAnswer,
 		Type: &answerType,
 	}
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
 	resp, err := c.PutAppsAppIdSessionsSessionIdRenegotiateWithResponse(
 		ctx, c.appId, session,
 		cloudflare_client.PutAppsAppIdSessionsSessionIdRenegotiateJSONRequestBody{
@@ -107,6 +115,9 @@ func (c *cloudFlareInfa) RenegatiateSession(ctx context.Context, session string,
 	)
 	if resp == nil {
 		return cloudflare_client.SessionDescription{}, errors.New("error passing JSON response for renegotiate session")
+	}
+	if resp.JSON200 == nil {
+		return cloudflare_client.SessionDescription{}, fmt.Errorf("%v", resp.HTTPResponse)
 	}
 	return *resp.JSON200, err
 }

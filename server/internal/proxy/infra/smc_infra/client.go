@@ -2,15 +2,16 @@ package smc_infra
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"proxy-srv/internal/proxy/configs"
 	"proxy-srv/pkg/gencode/smc_gen"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/v2"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/event"
 )
 
 type smcInfra struct {
@@ -63,12 +64,6 @@ func (s *smcInfra) CheckAuthorized(addressStr string) (bool, error) {
 
 var block *uint64 = nil
 
-func (s *smcInfra) SubCreateRoomEvent(ctx context.Context) (<-chan *smc_gen.MeeetingRoomCreated, event.Subscription, error) {
-	sink := make(chan *smc_gen.MeeetingRoomCreated)
-	eventSub, err := bind.WatchEvents(s.BoundContract, &bind.WatchOpts{Context: ctx, Start: block}, s.contract.UnpackRoomCreatedEvent, sink)
-	return sink, eventSub, err
-}
-
 func (s *smcInfra) SetParticipantSessionID(
 	ctx context.Context,
 	room_id string, addr string, session_id string,
@@ -84,14 +79,29 @@ func (s *smcInfra) SetParticipantSessionID(
 	return err
 }
 
-func (s *smcInfra) SubJoinRoomEvent(ctx context.Context) (<-chan *smc_gen.MeeetingParticipantJoined, event.Subscription, error) {
-	sink := make(chan *smc_gen.MeeetingParticipantJoined)
-	eventSub, err := bind.WatchEvents(s.BoundContract, &bind.WatchOpts{Context: ctx, Start: block}, s.contract.UnpackParticipantJoinedEvent, sink)
-	return sink, eventSub, err
-}
-
 func (s *smcInfra) GetParticipantsAndTracksOfRoom(roomId string) (smc_gen.GetParticipantOfRoomOutput, error) {
 	return bind.Call(s.BoundContract,
 		&bind.CallOpts{Pending: true, From: s.auth.From},
 		s.contract.PackGetParticipantOfRoom(roomId), s.contract.UnpackGetParticipantOfRoom)
+}
+
+var mutexSendEventToFrontend = sync.Mutex{}
+
+func (s *smcInfra) EmitEventToFrontend(rooId string, addrStr string, data any) error {
+	dataBytes, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	addr := common.HexToAddress(addrStr)
+	// _, err = bind.Call(s.BoundContract, &bind.CallOpts{Pending: true, From: s.auth.From},
+	// 	s.contract.PackForwardEventToFrontend(rooId, addr, dataBytes),
+	// 	utils.UnpackEmpty)
+	mutexSendEventToFrontend.Lock()
+	defer mutexSendEventToFrontend.Unlock()
+	tx, err := bind.Transact(s.BoundContract, s.auth, s.contract.PackForwardEventToFrontend(rooId, addr, dataBytes))
+	if err != nil {
+		return err
+	}
+	_, err = bind.WaitMined(context.Background(), s.conn, tx.Hash())
+	return err
 }

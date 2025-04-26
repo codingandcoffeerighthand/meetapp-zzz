@@ -3,14 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
-	command "proxy-srv/cmd/server/command"
-	"proxy-srv/internal/proxy/biz"
+	"proxy-srv/internal/proxy/app"
 	"proxy-srv/internal/proxy/configs"
-	"proxy-srv/internal/proxy/grpc"
+	"proxy-srv/internal/proxy/domain"
 	infras_cloudflare "proxy-srv/internal/proxy/infra/cloudflare"
 	"proxy-srv/internal/proxy/infra/smc_infra"
-	"proxy-srv/internal/proxy/infra/ws_grpc"
-	crypt_srv "proxy-srv/internal/proxy/service/crypt"
 	"proxy-srv/internal/utils"
 
 	"github.com/spf13/cobra"
@@ -38,6 +35,7 @@ var runCommand = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		fmt.Println(cfg)
 
 		cleanUp := func() {}
 		// clf
@@ -50,7 +48,7 @@ var runCommand = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// logger
+		// // logger
 		logger, cl, err := utils.NewLogger()
 		if err != nil {
 			return err
@@ -59,15 +57,12 @@ var runCommand = &cobra.Command{
 			cleanUp()
 			cl()
 		}
-		// ws grpc client
-		grpcCl := ws_grpc.NewClient(cfg, logger)
-		// crypt
-		crypt, err := crypt_srv.NewDumDecryptService()
+		// // crypt
+		crypt, err := domain.NewDumDecryptService()
 		if err != nil {
 			return err
 		}
-
-		biz, cl, err := biz.NewBiz(clf, smc, grpcCl, crypt, logger)
+		app, cl, err := app.NewApp(clf, smc, crypt, logger)
 		if err != nil {
 			return err
 		}
@@ -75,9 +70,14 @@ var runCommand = &cobra.Command{
 			cleanUp()
 			cl()
 		}
-		app := grpc.NewServerGrpc(biz, cfg.ServerConfig)
-		defer cleanUp()
-		return app.Listen()
+		fmt.Println("starting server...")
+		app.Done()
+
+		defer func() {
+			cleanUp()
+		}()
+		// defer cleanUp()
+		return nil
 
 	},
 }
@@ -88,7 +88,6 @@ func main() {
 	}
 	runCommand.Flags().String(flagConfigFilePath, "", "If provided, will use the provided config file.")
 	rootCommand.AddCommand(runCommand)
-	rootCommand.AddCommand(command.WsCommand())
 	if err := rootCommand.Execute(); err != nil {
 		log.Panic(err)
 	}

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useWeb3Store } from "@/store/web3";
-import { useWebSocketStore } from "@/store/ws";
 import { Car } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -30,12 +29,10 @@ export default function Home() {
       console.error(err)
     }
   }
-  const { ws, init, login } = useWebSocketStore()
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         {isLoading && <p className="text-red-500">loading...</p>}
-        <p>websocket : {isLoading && "loading"} {ws?.readyState}</p>
         {isConnected ? (
           <>
             <p>account: {account}</p>
