@@ -459,12 +459,12 @@ const useWeb3Store = create(
                 set({ isLoading: false })
             }
         },
-        closeStream: async (roomId, stream) => {
+        closeStream: async (roomId, streamNum) => {
             set({ isLoading: true })
             try {
-                const { contract, account, m, midsOfLocalStream, localPeerConnection } = get()
-                const offer = await localPeerConnection.createOffer()
-                const data = await contract.methods.removeTrack(roomId, stream.id).send({ from: account })
+                const { contract, account, midsOfLocalStream, localStreams } = get()
+                localStreams[streamNum].getTracks().forEach(track => track.stop())
+                await contract.methods.removeTrack(roomId, midsOfLocalStream[streamNum], "").send({ from: account })
             }
             catch (err) {
                 console.error(err)

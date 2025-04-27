@@ -31,3 +31,9 @@ func (s *smcInfra) SubAddTracks(ctx context.Context) (<-chan *smc_gen.MeeetingTr
 	eventSub, err := bind.WatchEvents(s.BoundContract, &bind.WatchOpts{Context: ctx, Start: block}, s.contract.UnpackTrackAddedEvent, sink)
 	return sink, eventSub, err
 }
+
+func (s *smcInfra) SubRemoveTrack(ctx context.Context) (<-chan *smc_gen.MeeetingRemoveTracks, event.Subscription, error) {
+	sink := make(chan *smc_gen.MeeetingRemoveTracks)
+	eventSub, err := bind.WatchEvents(s.BoundContract, &bind.WatchOpts{Context: ctx, Start: block}, s.contract.UnpackRemoveTracksEvent, sink)
+	return sink, eventSub, err
+}

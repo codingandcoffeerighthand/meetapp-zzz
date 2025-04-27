@@ -27,6 +27,7 @@ type SMCInfra interface {
 	EmitEventToFrontend(rooId string, addrStr string, data any) error
 	SubEventToBackend(ctx context.Context) (<-chan *smc_gen.MeeetingEventForwardedToBackend, event.Subscription, error)
 	SubAddTracks(ctx context.Context) (<-chan *smc_gen.MeeetingTrackAdded, event.Subscription, error)
+	SubRemoveTrack(ctx context.Context) (<-chan *smc_gen.MeeetingRemoveTracks, event.Subscription, error)
 }
 type CryptionService interface {
 	// Encrypt(data []byte) ([]byte, error)
@@ -86,6 +87,7 @@ func (b *app) Run(ctx context.Context) (func(), error) {
 	b.runSubJoinRoom(ctx, &cleanUp)
 	b.runSub(ctx, &cleanUp, b.HandlerEventForwardedToBackend)
 	b.runSub(ctx, &cleanUp, b.HandlerEventAddedTracks)
+	b.runSub(ctx, &cleanUp, b.HandlerEventRemovedTrack)
 
 	go func() {
 		for err := range b.errChan {

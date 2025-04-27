@@ -33,6 +33,14 @@ func (b *app) HandlerEventAddedTracks(ctx context.Context) (event.Subscription, 
 	handleEventSub(ctx, eventAddedTracksChan, b.EventAddedTracksHandler, b.errChan)
 	return eventAddedTracksSub, err
 }
+func (b *app) HandlerEventRemovedTrack(ctx context.Context) (event.Subscription, error) {
+	eventRemovedTrackChan, eventRemovedTrackSub, err := b.smc.SubRemoveTrack(ctx)
+	if err != nil {
+		return nil, err
+	}
+	handleEventSub(ctx, eventRemovedTrackChan, b.EventRemovedTrackHandler, b.errChan)
+	return eventRemovedTrackSub, err
+}
 
 // run
 func (b *app) runSubJoinRoom(ctx context.Context, cleanUp *func()) {
