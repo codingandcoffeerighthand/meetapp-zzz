@@ -37,3 +37,8 @@ func (s *smcInfra) SubRemoveTrack(ctx context.Context) (<-chan *smc_gen.Meeeting
 	eventSub, err := bind.WatchEvents(s.BoundContract, &bind.WatchOpts{Context: ctx, Start: block}, s.contract.UnpackRemoveTracksEvent, sink)
 	return sink, eventSub, err
 }
+func (s *smcInfra) SubLeaveRoom(ctx context.Context) (<-chan *smc_gen.MeeetingParticipantLeft, event.Subscription, error) {
+	sink := make(chan *smc_gen.MeeetingParticipantLeft)
+	eventSub, err := bind.WatchEvents(s.BoundContract, &bind.WatchOpts{Context: ctx, Start: block}, s.contract.UnpackParticipantLeftEvent, sink)
+	return sink, eventSub, err
+}

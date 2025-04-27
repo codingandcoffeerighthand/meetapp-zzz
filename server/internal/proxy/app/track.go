@@ -108,6 +108,11 @@ func (b *app) PullTrack(roomId string, pAddr string, sessionId string, ps []smc_
 		}(roomId, pAddr)
 		return *resp.SessionDescription.Sdp, err
 	}
+	err = b.smc.EmitEventToFrontend(roomId, pAddr, domain.EventPullTrack{
+		EventName:     domain.EventPullTrackName,
+		SdpOffer:      "",
+		RemoteSession: remoteSession,
+	})
 	return "", nil
 }
 

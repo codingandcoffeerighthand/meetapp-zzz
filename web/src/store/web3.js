@@ -366,6 +366,14 @@ const useWeb3Store = create(
             set({ isLoading: true })
             try {
                 set({ remoteTracks: {} })
+                if (!sdp_offer) {
+                    console.info("no remote track")
+                    set({
+                        remotePeerConnection: null,
+                        m: {}
+                    })
+                    return
+                }
                 const remotePeerConnection = await createPeerConnection()
                 remotePeerConnection.ontrack = (data) => {
                     if (data.track) {
@@ -467,6 +475,23 @@ const useWeb3Store = create(
                 await contract.methods.removeTrack(roomId, midsOfLocalStream[streamNum], "").send({ from: account })
             }
             catch (err) {
+                console.error(err)
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+        leaveRoom: async (roomId, callback = () => { }) => {
+            set({ isLoading: true })
+            try {
+                const { contract, account } = get()
+                if (!contract || !account) {
+                    throw new Error("Web3 not initialized or no accounts found")
+                }
+                await contract.methods.leaveRoom(roomId).send({
+                    from: account
+                })
+                callback()
+            } catch (err) {
                 console.error(err)
             } finally {
                 set({ isLoading: false })

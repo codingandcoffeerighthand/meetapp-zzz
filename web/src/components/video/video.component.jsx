@@ -46,13 +46,13 @@ export default function MediaStreamPlayer({
 
             mediaStream.addEventListener("addtrack", handleTrackChange)
             mediaStream.addEventListener("removetrack", handleTrackChange)
-            mediaStream.addEventListener("inactive", handleInActive)
+            // mediaStream.addEventListener("inactive", handleInActive)
 
             // Clean up when component unmounts or mediaStream changes
             return () => {
                 mediaStream.removeEventListener("addtrack", handleTrackChange)
                 mediaStream.removeEventListener("removetrack", handleTrackChange)
-                mediaStream.removeEventListener("inactive", handleInActive)
+                // mediaStream.removeEventListener("inactive", handleInActive)
 
                 if (videoRef.current && videoRef.current.srcObject) {
                     videoRef.current.srcObject = null
@@ -165,14 +165,16 @@ export default function MediaStreamPlayer({
                     )}
 
                     {/* Close button */}
-                    <button
-                        onClick={closeVideo}
-                        className="text-white hover:text-gray-300 focus:outline-none"
-                        aria-label="Close video"
-                        title="Close video"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
+                    {isLocal &&
+                        <button
+                            onClick={closeVideo}
+                            className="text-white hover:text-gray-300 focus:outline-none"
+                            aria-label="Close video"
+                            title="Close video"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    }
                 </div>
             </div>
         </div>

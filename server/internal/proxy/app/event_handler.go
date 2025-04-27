@@ -163,3 +163,6 @@ func (a *app) EventAddedTracksHandler(evt *smc_gen.MeeetingTrackAdded) error {
 func (a *app) EventRemovedTrackHandler(evt *smc_gen.MeeetingRemoveTracks) error {
 	return a.RoomPull(evt.RoomId)
 }
+func (a *app) EventLeaveRoom(evt *smc_gen.MeeetingParticipantLeft) error {
+	return a.RoomPull(evt.RoomId)
+}
