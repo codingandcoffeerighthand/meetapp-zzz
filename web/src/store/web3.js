@@ -202,21 +202,25 @@ const useWeb3Store = create(
             const evtSub = contract.events.EventForwardedToFrontend({
                 filter: { participant: address },
             }, (err, evt) => { console.info(err, evt) })
-            evtSub.on("data", data => {
+            evtSub.on("data", async data => {
                 // const json = JSON.parse(data)
                 const json = JSON.parse(Web3.utils.hexToUtf8(data.returnValues.eventData))
                 console.info(data)
                 console.info(json)
                 switch (json?.event_name) {
                     case "joined_room":
-                        setSPDAnswerLocalPeerConnection(json.sdp_answer, data.returnValues.roomId)
+                        await setSPDAnswerLocalPeerConnection(json.sdp_answer, data.returnValues.roomId)
                         break
                     case "pull_track":
-                        pullTrack(json.sdp_offer, json.remote_session, data.returnValues.roomId)
+                        await pullTrack(json.sdp_offer, json.remote_session, data.returnValues.roomId)
                         break
                     case "local_peer_connection_suscess":
                         break
                     case "new_participant_joined":
+                        break
+                    case "renegoiate_success":
+                        const { handleRenegoiateSuccess } = get()
+                        await handleRenegoiateSuccess(data.returnValues.roomId, json)
                         break
                     default:
                         console.error("Unknown event", json.event_name)
@@ -225,6 +229,36 @@ const useWeb3Store = create(
             evtSub.on("error", err => console.error(err))
             console.info(evtSub)
             set({ evtSub: evtSub })
+        },
+        handleRenegoiateSuccess: async (roomId, data) => {
+            set({ isLoading: true })
+            try {
+                const { getRoomTracks } = get()
+                await getRoomTracks(roomId)
+                const { m, remoteTracks } = get()
+                const tracks = data.tracks
+                const n = {}
+                tracks.forEach(t => {
+                    n[t.trackName] = remoteTracks[t.mid]
+                })
+                // debugger
+                Object.entries(m).forEach(([k, v]) => {
+                    v.trackNames.forEach(tn => {
+                        if (n[tn]) {
+                            m[k].stream.addTrack(
+                                n[tn],
+                            )
+                        }
+                    })
+                })
+                console.info(m)
+
+            } catch (err) {
+                console.error(err)
+            } finally {
+                set({ isLoading: false })
+            }
+
         },
         startListen: () => {
             const { contract, listenContractEvts } = get()
@@ -237,6 +271,7 @@ const useWeb3Store = create(
         localPeerConnection: null,
         localStreams: [],
         localStreamNumber: 0,
+        remoteTracks: {},
         startStream: async (roomId, participantName = "") => {
             set({ isLoading: true })
             const { contract, account, localStreams } = get()
@@ -245,22 +280,7 @@ const useWeb3Store = create(
             }
             try {
                 const localPeerConnection = await createPeerConnection()
-                const remotePeerConnection = await createPeerConnection()
-                remotePeerConnection.ontrack = (data) => {
-                    if (data.track) {
-                        const { remoteStreams } = get()
-                        const newStream = new MediaStream()
 
-                        newStream.addTrack(data.track)
-                        var streams = []
-                        if (remotePeerConnection) {
-                            streams = [...remoteStreams, newStream]
-                        }
-                        console.info(data)
-                        set({ remoteStreams: streams })
-                    }
-                }
-                set({ remotePeerConnection })
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                 const transceivers = stream.getTracks().map(
                     track => localPeerConnection?.addTransceiver(track, {
@@ -312,9 +332,27 @@ const useWeb3Store = create(
         remoteStreams: [],
         remoteSession: "",
         pullTrack: async (sdp_offer, remoteSession, roomId) => {
-            const { contract, remotePeerConnection, account } = get()
+            const { contract, account } = get()
             set({ isLoading: true })
             try {
+                set({ remoteTracks: {} })
+                const remotePeerConnection = await createPeerConnection()
+                remotePeerConnection.ontrack = (data) => {
+                    if (data.track) {
+                        const { remoteStreams, remoteTracks } = get()
+                        const newStream = new MediaStream()
+
+                        newStream.addTrack(data.track)
+                        // const tracks = [...remoteTracks, { track: data.track, mid: data?.transceiver?.mid }]
+                        const tracks = remoteTracks
+                        tracks[data?.transceiver?.mid] = data.track
+                        var streams = []
+                        if (remotePeerConnection) {
+                            streams = [...remoteStreams, newStream]
+                        }
+                        set({ remoteStreams: streams, remoteTracks: tracks })
+                    }
+                }
                 await remotePeerConnection.setRemoteDescription(
                     new RTCSessionDescription({ sdp: sdp_offer, type: "offer" }),
                 );
@@ -326,12 +364,12 @@ const useWeb3Store = create(
                     event_name: "renegoiate_session",
                     data: {
                         remote_session: remoteSession,
-                        sdp_answer: answerStr
+                        sdp_answer: answerStr,
+                        roomId: roomId,
+                        addr: account,
                     }
                 })
                 await contract.methods.forwardEventToBackend(roomId, data).send({ from: account })
-                const { getRoomTracks } = get()
-                await getRoomTracks(roomId)
 
             } catch (err) {
                 console.error(err)
@@ -339,7 +377,7 @@ const useWeb3Store = create(
                 set({ isLoading: false })
             }
         },
-
+        m: {},
         getRoomTracks: async (roomId) => {
             set({ isLoading: true })
             try {
@@ -348,27 +386,41 @@ const useWeb3Store = create(
                     from: account
                 })
                 const ps = data[0]
-                const tracks = data[1]
-                const mapParticipants = {}
+                const tracks = data[1].filter(t => t?.isPublished)
+                const m = {}
+                tracks.forEach(t => {
+                    if (t.isPublished) {
+                        const st = t?.streamNumber
+                        const s = t?.sessionId + "#" + st
+                        const n = t?.trackName
+                        if (!m[s]) {
+                            m[s] = {
+                                trackNames: [],
+                                stream: new MediaStream()
+                            }
+                        }
+                        m[s].trackNames.push(n)
+                    }
+                })
                 ps.forEach((p) => {
                     const session = p?.sessionID
-                    if (session) {
-                        mapParticipants[session] = {}
-                        mapParticipants[session].name = p?.name
-                        mapParticipants[session].address = p?.walletAddress
+                    if (p?.walletAddress != account) {
+                        Object.keys(m).forEach((key) => {
+                            if (key.startsWith(session)) {
+                                m[key].addr = p?.walletAddress
+                                const st = key.split("#")[1]
+                                m[key].name = p?.name + "#" + st
+                            }
+                        })
+                    } else {
+                        Object.keys(m).forEach((key) => {
+                            if (key.startsWith(session)) {
+                                delete m[key]
+                            }
+                        })
                     }
                 })
-                tracks.forEach(t => {
-                    const s = t?.sessionId
-                    const n = t?.trackName
-                    if (s && n) {
-                        if (mapParticipants[s]) {
-                            mapParticipants[s][n] = t
-                        }
-                    }
-
-                })
-                console.info(mapParticipants)
+                set({ m })
             } catch (err) {
                 console.error('Error getting room tracks:', err)
                 set({ error: err })

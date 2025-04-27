@@ -107,8 +107,11 @@ func (b *app) EventForwardBackendHandler(evt *smc_gen.MeeetingEventForwardedToBa
 		}
 		remote_session := data["remote_session"].(string)
 
+		roomId := data["roomId"].(string)
+		addr := data["addr"].(string)
+
 		go func() {
-			err := b.RenegatiateSession(context.Background(), remote_session, sdpAnswer)
+			err := b.RenegatiateSession(context.Background(), remote_session, sdpAnswer, roomId, addr)
 			if err != nil {
 				b.errChan <- fmt.Errorf("renegoiate error %v", err)
 			}

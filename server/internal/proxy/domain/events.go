@@ -66,3 +66,17 @@ func (e *EventPullTrack) ContractEventName() string {
 func (e *EventPullTrack) SetName() {
 	e.EventName = EventPullTrackName
 }
+
+type EventRenegoiateSuccess struct {
+	EventName string  `json:"event_name"`
+	Tracks    []Track `json:"tracks"`
+}
+
+const EventRenegoiateSuccessName = "renegoiate_success"
+
+func (e *EventRenegoiateSuccess) ContractEventName() string {
+	return e.EventName
+}
+func (e *EventRenegoiateSuccess) SetName() {
+	e.EventName = EventRenegoiateSuccessName
+}

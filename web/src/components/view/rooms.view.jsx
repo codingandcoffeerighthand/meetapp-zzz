@@ -6,9 +6,8 @@ import { useEffect } from "react";
 
 export default function RoomView({ roomId }) {
     const {
-        isConnected, account, isLoading, localStreams,
-        startListen, evtSub, addLocalTrack,
-        startStream: startLocalStream, remoteStreams
+        isConnected, account, isLoading, addLocalTrack, m,
+        startStream: startLocalStream, localStreams
     } = useWeb3Store()
 
 
@@ -41,7 +40,10 @@ export default function RoomView({ roomId }) {
                     </div>
                 })
             }
-            {remoteStreams.map((stream, idx) => (<MediaStreamPlayer key={idx} isLocal={false} mediaStream={stream} title="ppp" />))}
+            {/* {remoteStreams.map((stream, idx) => (<MediaStreamPlayer key={idx} isLocal={false} mediaStream={stream} title="ppp" />))} */}
+            {Object.values(m).map(t => (
+                <MediaStreamPlayer key={t.name} title={t.name} isLocal={false} mediaStream={t.stream} />
+            ))}
         </div>
     </>
 }

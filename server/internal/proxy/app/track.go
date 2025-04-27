@@ -111,7 +111,43 @@ func (b *app) PullTrack(roomId string, pAddr string, sessionId string, ps []smc_
 	return "", nil
 }
 
-func (b *app) RenegatiateSession(ctx context.Context, session string, sdpAnswer string) error {
+func (b *app) RenegatiateSession(ctx context.Context, session string, sdpAnswer string, roomId string, addr string) error {
 	_, err := b.clf.RenegatiateSession(ctx, session, sdpAnswer)
+	defer func() {
+		if r := recover(); r != nil {
+			b.errChan <- (r.(error))
+		}
+	}()
+	go func() {
+		err := b.EmmitRenegoiateSucces(session, roomId, addr)
+		if err != nil {
+			b.errChan <- err
+		}
+	}()
 	return err
+}
+
+func (b *app) EmmitRenegoiateSucces(sessionId string,
+	roomId string, addr string) error {
+	resp, err := b.clf.GetStatusSession(sessionId)
+	if err != nil {
+		return err
+	}
+	if resp == nil || resp.Tracks == nil {
+		return fmt.Errorf("status session %s nil", sessionId)
+	}
+	tracks := make([]domain.Track, len(*resp.Tracks))
+	for i, v := range *resp.Tracks {
+		tracks[i] = domain.Track{
+			Mid:       *v.Mid,
+			SessionId: *v.SessionId,
+			TrackName: *v.TrackName,
+		}
+	}
+	evt := domain.EventRenegoiateSuccess{
+		EventName: domain.EventRenegoiateSuccessName,
+		Tracks:    tracks,
+	}
+	b.smc.EmitEventToFrontend(roomId, addr, evt)
+	return nil
 }
