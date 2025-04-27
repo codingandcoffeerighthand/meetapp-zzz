@@ -7,15 +7,19 @@ import { useEffect } from "react";
 export default function RoomView({ roomId }) {
     const {
         isConnected, account, isLoading, addLocalTrack, m,
-        startStream: startLocalStream, localStreams
+        startStream: startLocalStream, localStreams, resetLocal,
+        closeStream
     } = useWeb3Store()
-
-
+    useEffect(() => {
+        resetLocal()
+        return resetLocal
+    }, [])
     const startStream = async () => {
         startLocalStream(roomId)
     }
 
-    const stopStream = () => {
+    const stopStream = async () => {
+        await closeStream(roomId, 1)
     }
     const addTrackHandle = async () => {
         const t = await navigator.mediaDevices.getDisplayMedia({
@@ -32,7 +36,7 @@ export default function RoomView({ roomId }) {
         <Button onClick={addTrackHandle}>share screen</Button>
         <div className="w-[60%] flex flex-col gap-4 mx-6">
             {
-                localStreams.map((stream, index) => {
+                Object.entries(localStreams).map(([index, stream]) => {
                     return <div key={index}>
                         <MediaStreamPlayer
                             mediaStream={stream} title={`local#${index}`}

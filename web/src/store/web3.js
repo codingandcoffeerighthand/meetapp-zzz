@@ -155,11 +155,11 @@ const useWeb3Store = create(
                 set({ isLoading: false })
             }
         },
+        midsOfLocalStream: {},
         addLocalTrack: async (stream, roomId) => {
             set({ isLoading: true })
             try {
                 const { localPeerConnection, contract, account, localStreams } = get()
-                set({ localStreams: [...localStreams, stream] })
                 if (!localPeerConnection) {
                     throw new Error("Local peer connection not initialized")
                 }
@@ -174,11 +174,22 @@ const useWeb3Store = create(
                 const offer = await localPeerConnection.createOffer()
                 await localPeerConnection.setLocalDescription(offer)
                 const offerStr = btoa(offer?.sdp)
-                const { localStreamNumber } = get()
+                const localStreamNumber = Object.keys(localStreams).length
+                localStreams[localStreamNumber] = stream
+                set({ localStreams })
+                const mids = get().midsOfLocalStream
+                transceivers.forEach(({ mid }) => {
+                    if (!mids[localStreamNumber]) {
+                        mids[localStreamNumber] = []
+                    }
+                    mids[localStreamNumber].push(mid)
+                })
+
+                set({ midsOfLocalStream: mids })
+
                 const tracks = transceivers.map(({ mid, sender }) => ([
                     sender?.track?.id, mid, localStreamNumber, "local", true, "", roomId
                 ]))
-                set({ localStreamNumber: localStreamNumber + 1 })
 
                 await contract.methods.addTrack(roomId, tracks, offerStr).send({ from: account })
             }
@@ -240,8 +251,10 @@ const useWeb3Store = create(
                 const { m, remoteTracks } = get()
                 const tracks = data.tracks
                 const n = {}
+                const tnM = {}
                 tracks.forEach(t => {
                     n[t.trackName] = remoteTracks[t.mid]
+                    tnM[t.trackName] = t.mid
                 })
                 // debugger
                 Object.entries(m).forEach(([k, v]) => {
@@ -250,6 +263,9 @@ const useWeb3Store = create(
                             m[k].stream.addTrack(
                                 n[tn],
                             )
+                        }
+                        if (tnM[tn]) {
+                            m[k].mids.push(tnM[tn])
                         }
                     })
                 })
@@ -264,16 +280,18 @@ const useWeb3Store = create(
         },
         startListen: () => {
             const { contract, listenContractEvts } = get()
-            set({ localPeerConnection: null, remotePeerConnection: null, localStreams: [], remoteStreams: [] })
+            set({ localPeerConnection: null, remotePeerConnection: null, localStreams: {}, remoteStreams: [] })
             if (contract) {
                 listenContractEvts(contract)
             }
         },
         //  localPeerConnection
         localPeerConnection: null,
-        localStreams: [],
-        localStreamNumber: 0,
+        localStreams: {},
         remoteTracks: {},
+        resetLocal: () => {
+            set({ localStreams: {}, m: {} })
+        },
         startStream: async (roomId, participantName = "") => {
             set({ isLoading: true })
             const { contract, account, localStreams } = get()
@@ -297,14 +315,21 @@ const useWeb3Store = create(
                 /*
                     format [trackId, mid, "local, true, "", roomid]
                 */
-                const { localStreamNumber } = get()
+                const localStreamNumber = Object.keys(localStreams).length
+                const mids = get().midsOfLocalStream
+                transceivers.forEach(({ mid }) => {
+                    if (!mids[localStreamNumber]) {
+                        mids[localStreamNumber] = []
+                    }
+                    mids[localStreamNumber].push(mid)
+                })
                 const tracks = transceivers.map(({ mid, sender }) => ([
                     sender?.track?.id, mid, localStreamNumber, "local", true, "", roomId
                 ]))
-                set({ localStreamNumber: localStreamNumber + 1 })
                 // debugger
                 await contract.methods.joinRoom(roomId, participantName, tracks, offerStr).send({ from: account })
-                set({ localPeerConnection, localStreams: [...localStreams, stream] })
+                localStreams[localStreamNumber] = stream
+                set({ localPeerConnection, localStreams })
                 return stream
 
             } catch (err) {
@@ -401,7 +426,8 @@ const useWeb3Store = create(
                         if (!m[s]) {
                             m[s] = {
                                 trackNames: [],
-                                stream: new MediaStream()
+                                stream: new MediaStream(),
+                                mids: []
                             }
                         }
                         m[s].trackNames.push(n)
@@ -429,6 +455,19 @@ const useWeb3Store = create(
             } catch (err) {
                 console.error('Error getting room tracks:', err)
                 set({ error: err })
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+        closeStream: async (roomId, stream) => {
+            set({ isLoading: true })
+            try {
+                const { contract, account, m, midsOfLocalStream, localPeerConnection } = get()
+                const offer = await localPeerConnection.createOffer()
+                const data = await contract.methods.removeTrack(roomId, stream.id).send({ from: account })
+            }
+            catch (err) {
+                console.error(err)
             } finally {
                 set({ isLoading: false })
             }
