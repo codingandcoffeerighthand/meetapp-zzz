@@ -1,13 +1,11 @@
-# Docs
+# Introduction
+
+- very simple meeting app using smart contract on EVM
 
 ## Feature
 
-- Register/Logout
 - Create Room
-- Delete Room
 - Join Room
-- Chat in room
-- Chat with 1 participant
 - Add/remove Tracks (screen, mute mic, ...)
 - Exit room
 
@@ -32,5 +30,8 @@
 - sessin id
 
 
-### Register/Logout
--
+### Track
+
+- sesionId
+- mid
+- trackname
