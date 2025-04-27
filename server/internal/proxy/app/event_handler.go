@@ -8,6 +8,7 @@ import (
 	"proxy-srv/internal/proxy/domain"
 	"proxy-srv/pkg/gencode/cloudflare_client"
 	"proxy-srv/pkg/gencode/smc_gen"
+	"strings"
 	"time"
 )
 
@@ -121,4 +122,40 @@ func (b *app) EventForwardBackendHandler(evt *smc_gen.MeeetingEventForwardedToBa
 		return fmt.Errorf("unknown event name %s", evtData.EventName)
 	}
 	return nil
+}
+
+func (a *app) EventAddedTracksHandler(evt *smc_gen.MeeetingTrackAdded) error {
+	if len(evt.Tracks) == 0 {
+		return errors.New("add track: tracks is empty")
+	}
+	sessionId := evt.Tracks[0].SessionId
+	if strings.TrimSpace(sessionId) == "" {
+		return errors.New("add track: sesion id is empty")
+	}
+	sdpOffer, err := a.cryt.Decrypt(evt.SdpOffer)
+	if err != nil {
+		return fmt.Errorf("add track: sdpOffer decrypt %v", err)
+	}
+	var tracks = make([]cloudflare_client.TrackObject, len(evt.Tracks))
+	for i, v := range evt.Tracks {
+		tracks[i] = cloudflare_client.TrackObject{
+			Mid:       &v.Mid,
+			SessionId: &sessionId,
+			TrackName: &v.TrackName,
+		}
+	}
+	resp, err := a.clf.AddLocalTrack(context.Background(), sessionId, sdpOffer, tracks)
+	if err != nil {
+		return fmt.Errorf("add track: add local track %v", err)
+	}
+	if resp.SessionDescription == nil || resp.SessionDescription.Sdp == nil {
+		return errors.New("add track: add local track response is nil")
+	}
+	sdpAnswer := *resp.SessionDescription.Sdp
+	err = a.smc.EmitEventToFrontend(evt.RoomId, evt.Participant.String(),
+		domain.EventJoinedRoom{
+			EventName: domain.EventJoinedRoomName,
+			SdpAnswer: sdpAnswer,
+		})
+	return err
 }

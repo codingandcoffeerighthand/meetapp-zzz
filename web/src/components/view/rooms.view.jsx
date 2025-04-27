@@ -17,7 +17,7 @@ export default function RoomView({ roomId }) {
 
     const stopStream = () => {
     }
-    const addTrackHanle = async () => {
+    const addTrackHandle = async () => {
         const t = await navigator.mediaDevices.getDisplayMedia({
             video: true,
         })
@@ -29,7 +29,7 @@ export default function RoomView({ roomId }) {
         <p>web e: {isConnected} account: {account}</p>
         <Button onClick={startStream}>start</Button>
         <Button onClick={stopStream}>stop</Button>
-        <Button onClick={addTrackHanle}>share screen</Button>
+        <Button onClick={addTrackHandle}>share screen</Button>
         <div className="w-[60%] flex flex-col gap-4 mx-6">
             {
                 localStreams.map((stream, index) => {

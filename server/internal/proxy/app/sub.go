@@ -25,6 +25,15 @@ func (b *app) HandlerEventForwardedToBackend(ctx context.Context) (event.Subscri
 	return eventForwardedToBackendSub, err
 }
 
+func (b *app) HandlerEventAddedTracks(ctx context.Context) (event.Subscription, error) {
+	eventAddedTracksChan, eventAddedTracksSub, err := b.smc.SubAddTracks(ctx)
+	if err != nil {
+		return nil, err
+	}
+	handleEventSub(ctx, eventAddedTracksChan, b.EventAddedTracksHandler, b.errChan)
+	return eventAddedTracksSub, err
+}
+
 // run
 func (b *app) runSubJoinRoom(ctx context.Context, cleanUp *func()) {
 	go func() {

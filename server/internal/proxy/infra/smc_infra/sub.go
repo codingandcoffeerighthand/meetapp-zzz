@@ -25,3 +25,9 @@ func (s *smcInfra) SubEventToBackend(ctx context.Context) (<-chan *smc_gen.Meeet
 	eventSub, err := bind.WatchEvents(s.BoundContract, &bind.WatchOpts{Context: ctx, Start: block}, s.contract.UnpackEventForwardedToBackendEvent, sink)
 	return sink, eventSub, err
 }
+
+func (s *smcInfra) SubAddTracks(ctx context.Context) (<-chan *smc_gen.MeeetingTrackAdded, event.Subscription, error) {
+	sink := make(chan *smc_gen.MeeetingTrackAdded)
+	eventSub, err := bind.WatchEvents(s.BoundContract, &bind.WatchOpts{Context: ctx, Start: block}, s.contract.UnpackTrackAddedEvent, sink)
+	return sink, eventSub, err
+}

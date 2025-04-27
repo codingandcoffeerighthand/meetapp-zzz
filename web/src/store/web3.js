@@ -158,7 +158,8 @@ const useWeb3Store = create(
         addLocalTrack: async (stream, roomId) => {
             set({ isLoading: true })
             try {
-                const { localPeerConnection, contract, account } = get()
+                const { localPeerConnection, contract, account, localStreams } = get()
+                set({ localStreams: [...localStreams, stream] })
                 if (!localPeerConnection) {
                     throw new Error("Local peer connection not initialized")
                 }
@@ -170,15 +171,16 @@ const useWeb3Store = create(
                 /*
                     format [trackId, mid, "local, true, "", roomid]
                 */
+                const offer = await localPeerConnection.createOffer()
+                await localPeerConnection.setLocalDescription(offer)
+                const offerStr = btoa(offer?.sdp)
+                const { localStreamNumber } = get()
                 const tracks = transceivers.map(({ mid, sender }) => ([
-                    sender?.track?.id, mid, "local", true, "", roomId
+                    sender?.track?.id, mid, localStreamNumber, "local", true, "", roomId
                 ]))
-                console.info(roomId, tracks[0])
-                await contract.methods.addTrack(roomId, tracks[0]).send({ from: account })
-                const data = Web3.utils.toHex({
-                    event_name: "local_peer_connection_suscess"
-                })
-                await contract.methods.forwardEventToBackend(roomId, data).send({ from: account })
+                set({ localStreamNumber: localStreamNumber + 1 })
+
+                await contract.methods.addTrack(roomId, tracks, offerStr).send({ from: account })
             }
             catch (err) { console.error(err) }
             finally {
@@ -318,7 +320,10 @@ const useWeb3Store = create(
                 await localPeerConnection.setRemoteDescription(
                     new RTCSessionDescription({ sdp: sdpAnswer, type: "answer" }),
                 );
-                await waitLocalConnection(localPeerConnection)
+                console.info(localPeerConnection.connectionState)
+                if (localPeerConnection.connectionState != "connected") {
+                    await waitLocalConnection(localPeerConnection)
+                }
                 const data = Web3.utils.toHex({
                     event_name: "local_peer_connection_suscess"
                 })

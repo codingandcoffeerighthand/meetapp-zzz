@@ -28,7 +28,9 @@ export default function MediaStreamPlayer({
             }
 
             // Listen for track additions/removals to update hasAudio state
-            const handleTrackChange = () => {
+            const handleTrackChange = (evt) => {
+
+                console.info("add track", evt, mediaStream.getAudioTracks)
                 const updatedAudioTracks = mediaStream.getAudioTracks()
                 setHasAudio(updatedAudioTracks.length > 0)
 
@@ -65,7 +67,7 @@ export default function MediaStreamPlayer({
 
     // Toggle playback mute (this affects only what the user hears)
     const toggleMute = () => {
-        if (videoRef.current && hasAudio) {
+        if (videoRef.current && mediaStream.getAudioTracks().length > 0) {
             videoRef.current.muted = !videoRef.current.muted
             setIsMuted(!isMuted)
         }
@@ -102,7 +104,7 @@ export default function MediaStreamPlayer({
                 <div className="bg-gray-800 text-white py-2 px-4 flex items-center justify-between">
                     <h2 className="font-medium text-sm md:text-base truncate">{title}</h2>
                     <div className="flex items-center gap-2">
-                        {hasAudio ? (
+                        {mediaStream.getAudioTracks().length > 0 ? (
                             <span className="text-xs bg-green-900/50 px-2 py-0.5 rounded">Audio</span>
                         ) : (
                             <span className="text-xs bg-gray-700/50 px-2 py-0.5 rounded">No Audio</span>
@@ -151,7 +153,7 @@ export default function MediaStreamPlayer({
                 {/* Right side controls */}
                 <div className="flex items-center space-x-4">
                     {/* Mute/Unmute button - only show if stream has audio */}
-                    {hasAudio && (
+                    {mediaStream.getAudioTracks().length > 0 && (
                         <button
                             onClick={toggleMute}
                             className="text-white hover:text-gray-300 focus:outline-none"
