@@ -12,12 +12,13 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const {
     isConnected, account, addKey, getOwner, contract, initContract, isAuthorized,
-    register, createRoom, isLoading
+    register, createRoom, isLoading, err
   } = useWeb3Store()
   const [ower, setOwer] = useState("")
   const [roomIdJoin, setRoomIdJoin] = useState("")
   const [prk, setPrk] = useState("")
   const router = useRouter()
+  const [roomName, setRoomName] = useState("")
   const getOwnerHandler = async () => {
     const ownerAddress = await getOwner()
     setOwer(ownerAddress)
@@ -36,7 +37,6 @@ export default function Home() {
         {isConnected ? (
           <>
             <p>account: {account}</p>
-            <Link href="/page1" className="flex gap-2 items-center"> <Car /> Page 1</Link>
           </>
         ) : (
           <>
@@ -47,14 +47,11 @@ export default function Home() {
         {contract ? (
           isAuthorized ?
             <>
-              <Card className="w-[200px]">
-                <Button onClick={getOwnerHandler} className="w-[200px]">Get Owner</Button>
-                <p>owner: {ower}</p>
-              </Card>
-              <Card className="w-[200px]">
+              <Card className="w-full p-4">
+                <Input placeholder="room name" type="text" onChange={(e) => setRoomName(e.target.value)} />
                 <Button onClick={() => createRoom(
-                  "", (roomId) => router.push(`/room/${roomId}`)
-                )} className="w-[200px]">Create Room</Button>
+                  roomName, (roomId) => router.push(`/room/${roomId}`)
+                )} className="">Create Room</Button>
               </Card>
             </>
             :
@@ -62,13 +59,17 @@ export default function Home() {
         ) : (
           <Button onClick={initContract} className="w-[200px]">Init Contract</Button>
         )}
-        <div>
-          <h2>Join room</h2>
-          <label> room id </label>
-          <input type="text" onChange={(e) => setRoomIdJoin(e.target.value)}
-            className="border-1 border-black"
-          />
-          <Link href={`/room/${roomIdJoin}`} className="flex gap-2 items-center"> <Car /> Join Room</Link>
+        <div className="w-full">
+          <Card className="w-full p-4">
+
+            <h2>Join room</h2>
+            <Input placeholder="room name" type="text" onChange={(e) => setRoomIdJoin(e.target.value)}
+              className="border-1 border-black"
+            />
+            <Button asChild>
+              <Link href={`/room/${roomIdJoin}`} className="flex gap-2 items-center"> <Car /> Join Room</Link>
+            </Button>
+          </Card>
         </div>
       </main>
     </div >

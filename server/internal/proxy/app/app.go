@@ -58,6 +58,9 @@ func NewApp(clf CloudFlareInfra, smc SMCInfra, crypt CryptionService, log *zap.L
 	cl, err := b.Run(context.Background())
 	return b, cl, err
 }
+func NewAppInterface(clf CloudFlareInfra, smc SMCInfra, crypt CryptionService, log *zap.Logger) (App, func(), error) {
+	return NewApp(clf, smc, crypt, log)
+}
 
 type EventHandler[Ev bind.ContractEvent] func(*Ev) error
 

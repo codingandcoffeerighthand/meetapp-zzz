@@ -2,8 +2,10 @@
 import { useWeb3Store } from "@/store/web3";
 import MediaStreamPlayer from "../video/video.component";
 import { Button } from "../ui/button";
-import { useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Card } from "../ui/card";
+import { Input } from "../ui/input";
 
 export default function RoomView({ roomId }) {
     const {
@@ -16,9 +18,9 @@ export default function RoomView({ roomId }) {
         return resetLocal
     }, [])
     const startStream = async () => {
-        startLocalStream(roomId)
+        startLocalStream(roomId, name)
     }
-
+    const [name, setName] = useState("")
     const stopStream = async (streamNum) => {
         await closeStream(roomId, streamNum)
     }
@@ -34,16 +36,25 @@ export default function RoomView({ roomId }) {
         leaveRoom(roomId, () => router.push("/"))
     }
 
-    return <>
-        {isLoading && <p className="text-red-500">Loading...</p>}
-        <p>web e: {isConnected} account: {account}</p>
-        <Button onClick={startStream}>start</Button>
-        <Button onClick={addTrackHandle}>share screen</Button>
-        <Button onClick={handleLeaveRoom}>exit room</Button>
-        <div className="w-[60%] flex flex-col gap-4 mx-6">
+    return <div>
+        <div className="flex justify-between">
+            <div className="p-4">
+                {isLoading && <p className="text-red-500">Loading...</p>}
+                <p>account: {account}</p>
+            </div>
+            <div className="m-auto flex gap-4 justify-center">
+                <Input className="inline-block" placeholder="name" type="text" value={name}
+                    onChange={(e) => setName(e.target.value)}
+                />
+                <Button className="inline-inline" onClick={startStream}>start</Button>
+                <Button onClick={addTrackHandle}>share screen</Button>
+                <Button onClick={handleLeaveRoom}>exit room</Button>
+            </div>
+        </div>
+        <div className="w-full flex flex-wrap justify-center gap-4 mx-6">
             {
                 Object.entries(localStreams).map(([index, stream]) => {
-                    return <div key={index}>
+                    return <div key={index} className="w-[300px]">
                         <MediaStreamPlayer
                             mediaStream={stream} title={`local#${index}`}
                             isLocal={true}
@@ -54,8 +65,10 @@ export default function RoomView({ roomId }) {
             }
             {/* {remoteStreams.map((stream, idx) => (<MediaStreamPlayer key={idx} isLocal={false} mediaStream={stream} title="ppp" />))} */}
             {Object.values(m).map(t => (
-                <MediaStreamPlayer key={t.name} title={t.name} isLocal={false} mediaStream={t.stream} />
+                <div key={t.name} className="w-[300px]">
+                    <MediaStreamPlayer key={t.name} title={t.name} isLocal={false} mediaStream={t.stream} />
+                </div>
             ))}
         </div>
-    </>
+    </div>
 }
