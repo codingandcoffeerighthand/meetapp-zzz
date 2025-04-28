@@ -41,18 +41,17 @@ export default function MediaStreamPlayer({
             }
             const handleInActive = () => {
                 setIsVisible(false)
-                closeVideoCallback()
             }
 
             mediaStream.addEventListener("addtrack", handleTrackChange)
             mediaStream.addEventListener("removetrack", handleTrackChange)
-            // mediaStream.addEventListener("inactive", handleInActive)
+            mediaStream.addEventListener("inactive", handleInActive)
 
             // Clean up when component unmounts or mediaStream changes
             return () => {
                 mediaStream.removeEventListener("addtrack", handleTrackChange)
                 mediaStream.removeEventListener("removetrack", handleTrackChange)
-                // mediaStream.removeEventListener("inactive", handleInActive)
+                mediaStream.removeEventListener("inactive", handleInActive)
 
                 if (videoRef.current && videoRef.current.srcObject) {
                     videoRef.current.srcObject = null

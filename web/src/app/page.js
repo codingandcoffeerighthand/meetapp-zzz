@@ -52,6 +52,18 @@ export default function Home() {
                 <Button onClick={() => createRoom(
                   roomName, (roomId) => router.push(`/room/${roomId}`)
                 )} className="">Create Room</Button>
+
+              </Card>
+
+              <Card className="w-full p-4">
+
+                <h2>Join room</h2>
+                <Input placeholder="room name" type="text" onChange={(e) => setRoomIdJoin(e.target.value)}
+                  className="border-1 border-black"
+                />
+                <Button asChild>
+                  <Link href={`/room/${roomIdJoin}`} className="flex gap-2 items-center"> <Car /> Join Room</Link>
+                </Button>
               </Card>
             </>
             :
@@ -60,16 +72,7 @@ export default function Home() {
           <Button onClick={initContract} className="w-[200px]">Init Contract</Button>
         )}
         <div className="w-full">
-          <Card className="w-full p-4">
 
-            <h2>Join room</h2>
-            <Input placeholder="room name" type="text" onChange={(e) => setRoomIdJoin(e.target.value)}
-              className="border-1 border-black"
-            />
-            <Button asChild>
-              <Link href={`/room/${roomIdJoin}`} className="flex gap-2 items-center"> <Car /> Join Room</Link>
-            </Button>
-          </Card>
         </div>
       </main>
     </div >
