@@ -22,14 +22,14 @@ const useWeb3Store = create(
         evtHandlers: {},
 
         // Wallet and account
-        initWeb3: async () => {
+        initWeb3: async (privateKey) => {
             if (typeof window !== "undefined") {
                 set({ isLoading: true, error: null })
                 try {
                     let web3Instance;
                     const provider = new Web3.providers.WebsocketProvider(process.env.NEXT_PUBLIC_INFURA_URL);
                     web3Instance = new Web3(provider);
-                    const prK = localStorage?.getItem('prK')
+                    const prK = privateKey
                     if (!prK) {
                         set({ err: new Error("Private key not found") })
                         return
@@ -48,8 +48,8 @@ const useWeb3Store = create(
         addKey: async (pk) => {
             set({ isLoading: true })
             try {
-                localStorage.setItem('prK', pk)
-                await get().initWeb3()
+                // localStorage.setItem('prK', pk)
+                await get().initWeb3(pk)
             } catch (err) {
                 console.error(err)
                 set({ err: err })

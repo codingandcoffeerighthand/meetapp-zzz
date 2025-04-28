@@ -48,7 +48,7 @@ export default function Home() {
           isAuthorized ?
             <>
               <Card className="w-full p-4">
-                <Input placeholder="room name" type="text" onChange={(e) => setRoomName(e.target.value)} />
+                {/* <Input placeholder="room name" type="text" onChange={(e) => setRoomName(e.target.value)} /> */}
                 <Button onClick={() => createRoom(
                   roomName, (roomId) => router.push(`/room/${roomId}`)
                 )} className="">Create Room</Button>

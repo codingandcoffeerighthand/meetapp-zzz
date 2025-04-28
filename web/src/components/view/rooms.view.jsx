@@ -43,9 +43,9 @@ export default function RoomView({ roomId }) {
                 <p>account: {account}</p>
             </div>
             <div className="m-auto flex gap-4 justify-center">
-                <Input className="inline-block" placeholder="name" type="text" value={name}
+                {/* <Input className="inline-block" placeholder="name" type="text" value={name}
                     onChange={(e) => setName(e.target.value)}
-                />
+                /> */}
                 <Button className="inline-inline" onClick={startStream}>start</Button>
                 <Button onClick={addTrackHandle}>share screen</Button>
                 <Button onClick={handleLeaveRoom}>exit room</Button>
