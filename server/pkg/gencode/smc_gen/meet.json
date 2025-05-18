@@ -207,6 +207,19 @@
   },
   {
     "type": "function",
+    "name": "getIceServers",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "getParticipantInfoBySessionId",
     "inputs": [
       {
@@ -582,6 +595,19 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setIceServers",
+    "inputs": [
+      {
+        "name": "_iceServers",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "event",

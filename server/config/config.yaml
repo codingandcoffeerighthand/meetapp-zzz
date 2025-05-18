@@ -1,0 +1,18 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+  env: development
+cloudflare:
+  base_url: https://rtc.live.cloudflare.com/v1/
+  app_id: 3c4d5c9fb2cc47a390100b31e579b4fb
+  app_secret: c5675b0e44c5003f9de0491af5da5d84e953129c7cfcd7f6081bf357b6176057
+  turn_id: 1234567890
+  turn_token: 1234567890
+web3:
+  rpc_url: ws://localhost:8545
+  chan_id: 1234567890
+  private_key: 77814517325470205911140941194401928579557062014761831930645393041380819009408
+  contract_address: '0x8a791620dd6260079bf849dc5567adc3f2fdc318'
+ws:
+  url: ""
+private_key_rsa: 77814517325470205911140941194401928579557062014761831930645393041380819009408

@@ -45,6 +45,7 @@ contract Meet {
     mapping(string => Room) public rooms;
     address[] public authorizedBackends;
     address public owner;
+    string private iceServers;
 
     /*
      *******************************
@@ -155,6 +156,10 @@ contract Meet {
 
     function addAuthorized() public {
         _addAuthorized(msg.sender);
+    }
+
+    function setIceServers(string memory _iceServers) public onlyOwner {
+        iceServers = _iceServers;
     }
 
     function createRoom(
@@ -413,5 +418,14 @@ contract Meet {
             }
         }
         return false;
+    }
+
+    function getIceServers()
+        public
+        view
+        onlyAuthorized
+        returns (string memory)
+    {
+        return iceServers;
     }
 }
