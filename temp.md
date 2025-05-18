@@ -141,3 +141,12 @@ triền khai code
 comment rõ ràng
 
 ```
+
+```
+code lại smartcontract theo các yêu cấu sau:
+
+smart có nhiều user
+mỗi 1 address đăng ký được tính là 1 user
+1 room có nhiều thành viên
+1 user có thễ join room nhiều lần, mỗi lấn tính là 1 thành viên
+```
