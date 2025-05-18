@@ -238,5 +238,4 @@ func (s *app) BackendHandler(ctx context.Context, evt *domain.BackendEvent) erro
 		s.errChan <- err
 		return err
 	}
-	return nil
 }
