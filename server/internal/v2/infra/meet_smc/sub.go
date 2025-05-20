@@ -94,18 +94,24 @@ func (s *smcInfra) SubAddTracksEvent(ctx context.Context) (
 	}()
 	go func() {
 		for evt := range sink {
+			sdpOffer, err := base64.StdEncoding.DecodeString(evt.SdpOffer)
+			if err != nil {
+				s.errChan <- fmt.Errorf("sub join room event %v", err)
+				continue
+			}
 			evtDomain := &domain.AddTracksEvent{
 				RoomID:    evt.RoomId,
 				SessionID: evt.SessionId,
 				Tracks:    make([]domain.Track, len(evt.Tracks)),
-				SdpOffer:  evt.SdpOffer,
+				SdpOffer:  string(sdpOffer),
 			}
 			for i, track := range evt.Tracks {
 				evtDomain.Tracks[i] = domain.Track{
-					Mid:       track.Mid,
-					TrackName: track.TrackName,
-					SessionID: track.SessionId,
-					Location:  track.Location,
+					Mid:          track.Mid,
+					StreamNumber: uint(track.StreamNumber.Int64()),
+					TrackName:    track.TrackName,
+					SessionID:    evt.SessionId,
+					Location:     track.Location,
 				}
 			}
 			sinkDomain <- evtDomain

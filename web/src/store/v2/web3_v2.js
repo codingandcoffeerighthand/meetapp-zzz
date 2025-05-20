@@ -5,6 +5,7 @@ import abi from '@/abi/abi.json'
 import Web3 from 'web3'
 import { useLocalStream } from './localStream'
 import useRemoteStream from './remoteStream'
+import { useCallback } from 'react'
 
 const useWeb3V2Store = create(
     subscribeWithSelector((set, get) => ({
@@ -168,6 +169,7 @@ const useWeb3V2Store = create(
 
                 evtSub.on("data", async evt => {
                     const data = evt?.returnValues
+                    console.info("#### event", evt)
                     switch (data?.eventType) {
                         case EventType.JOINED_ROOM:
                             await get().handlerLocalConnected(data?.data)
@@ -180,6 +182,9 @@ const useWeb3V2Store = create(
                             break
                         case EventType.RemoteConnectSuccess:
                             await get().handlerRemoteConnectSuccess(data)
+                            break
+                        case EventType.NoRemoteTracks:
+                            await useRemoteStream.getState().handlerNoRemoteTracks(data?.data)
                             break
                         default:
                             console.info("#### unknown event", evt)
@@ -292,6 +297,34 @@ const useWeb3V2Store = create(
                 set({ isLoading: false })
             }
         },
+
+        callLeaveRoom: async (rommID, callback = () => { }) => {
+            set({ isLoading: true, error: null })
+            try {
+                get()._modifierContract()
+                const { contract, account, localSession } = get()
+                await contract.methods.leaveRoom(rommID, localSession).send({ from: account })
+                callback()
+            } catch (err) {
+                console.error("Error leaving room:", err)
+                set({ error: err })
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+        addLocalTracks: async (stream, roomId) => {
+            set({ isLoading: true })
+            try {
+                const { tracks, sdpString } = await useLocalStream.getState().addLocalTracks(stream, roomId)
+                const { contract, account, localSession } = get()
+                await contract.methods.addTracks(roomId, localSession, tracks, sdpString).send({ from: account })
+            } catch (err) {
+                console.error("Error adding local track:", err)
+                set({ error: err })
+            } finally {
+                set({ isLoading: false })
+            }
+        }
         // end
     })))
 
@@ -301,6 +334,7 @@ const EventType = {
     RemoteConnected: "remote_connected",
     RemoteConnect: "remote_connect",
     RemoteConnectSuccess: "remote_connect_success",
+    NoRemoteTracks: "no-remote-tracks",
 }
 
 export {

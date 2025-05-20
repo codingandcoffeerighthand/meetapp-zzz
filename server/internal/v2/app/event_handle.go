@@ -66,6 +66,7 @@ func (a *App) JoinRoomHandler(ctx context.Context, evt *domain.JoinRoomEvent) er
 */
 
 func (a *App) PullTracksForRoom(ctx context.Context, roomID string) error {
+	time.Sleep(3 * time.Second)
 	defer func() {
 		if r := recover(); r != nil {
 			a.errChan <- fmt.Errorf("pull tracks for participant %v", r)
@@ -102,12 +103,13 @@ func (a *App) PullTracksForParticipant(ctx context.Context,
 
 	tracksOfParticipant := make([]domain.Track, 0)
 	for _, track := range tracksOfRoom {
-		if track.SessionID != sessionID {
+		if track.SessionID != "" && track.SessionID != sessionID {
 			tracksOfParticipant = append(tracksOfParticipant, track)
 		}
 	}
 	if len(tracksOfParticipant) == 0 {
-		return nil
+		err := a.meet.EmitFrontEndEvent(ctx, roomID, sessionID, "no-remote-tracks", []byte("no-remote-tracks"))
+		return err
 	}
 
 	sdpoffer, err := a.clf.AddRemoteTrack(ctx, remoteSession, tracksOfParticipant)
@@ -171,7 +173,6 @@ func (s *App) LocalConnectedHandler(ctx context.Context, evt *domain.LocalConnec
 			s.errChan <- fmt.Errorf("local connected %v", r)
 		}
 	}()
-	time.Sleep(3 * time.Second)
 	err := s.PullTracksForRoom(ctx, evt.RoomID)
 	if err != nil {
 		return err

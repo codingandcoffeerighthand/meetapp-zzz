@@ -87,6 +87,9 @@ const useRemoteStream = create(
             })
             set({ mapRemoteStreams })
         },
+        handlerNoRemoteTracks: () => {
+            set({ mapRemoteStreams: {}, remoteTracks: {}, remoteStreams: [] })
+        }
     }))
 )
 

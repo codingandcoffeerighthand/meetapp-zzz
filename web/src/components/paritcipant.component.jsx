@@ -5,22 +5,26 @@ import { Button } from "./ui/button"
 import { Card } from "./ui/card"
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
-import { useLocalStream } from "@/store/v2/localStream"
 import { useState } from "react"
 import ErrorComponent from "./error.component"
 import LoadingScreen from "./loading.component"
-import useRemoteStream from "@/store/v2/remoteStream"
 
 export default function ParticipantComponent({ roomId }) {
-    const { account, isLoading: web3Loading, error: web3Error, handleJoinRoom } = useWeb3V2Store()
-    const { remotePeerConnection } = useRemoteStream()
+    const { account, isLoading: web3Loading, error: web3Error,
+        handleJoinRoom, callLeaveRoom, addLocalTracks
+    } = useWeb3V2Store()
+    if (!account) {
+        if (window) {
+            window.location.href = "/v2"
+        }
+    }
     const [participantName, setParticipantName] = useState("")
     const [isStream, setIsStream] = useState(false)
-    if (!account) {
-        window.location.href = "/v2"
-    }
-    const handlerShareScreen = () => {
-        console.info(remotePeerConnection.connectionState)
+    const handlerAddLocalTracks = async () => {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+            video: true,
+        })
+        await addLocalTracks(stream, roomId)
     }
     return (
         <>
@@ -45,12 +49,20 @@ export default function ParticipantComponent({ roomId }) {
                     </Button>
                     <Button
                         onClick={() => {
-                            handlerShareScreen()
+                            handlerAddLocalTracks()
                         }}
                     >
                         Share screen
                     </Button>
-                    <Button>
+                    <Button
+                        onClick={() => {
+                            callLeaveRoom(roomId, () => {
+                                if (window) {
+                                    window.location.href = "/v2"
+                                }
+                            })
+                        }}
+                    >
                         Leave room
                     </Button>
                 </Card>

@@ -248,6 +248,10 @@ contract Meet {
             rooms[_roomId].participants[participantIndex].tracks.push(
                 _tracks[i]
             );
+            rooms[_roomId]
+                .participants[participantIndex]
+                .tracks[i]
+                .sessionId = _sessionId;
         }
         emit AddTracksEvent(_roomId, _sessionId, _tracks, _sdpOffer);
     }

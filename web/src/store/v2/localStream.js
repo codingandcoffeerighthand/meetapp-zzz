@@ -79,6 +79,43 @@ const useLocalStream = create(
             set({ localPeerConnection })
         },
 
+        addLocalTracks: async (stream, roomId) => {
+            set({ isLoading: true })
+            try {
+                const { localPeerConnection, localStreams } = get()
+                if (!localPeerConnection) {
+                    throw new Error("Local peer connection not initialized")
+                }
+                const transceivers = stream.getTracks().map(
+                    track => localPeerConnection.addTransceiver(track, {
+                        direction: "sendonly"
+                    })
+                )
+                const offer = await localPeerConnection.createOffer()
+                await localPeerConnection.setLocalDescription(offer)
+                const offerStr = btoa(offer?.sdp)
+                const localStreamNumber = localStreams.length
+                const mids = []
+                transceivers.forEach(({ mid }) => {
+                    mids.push(mid)
+                })
+                localStreams[localStreamNumber] = {}
+                localStreams[localStreamNumber].stream = stream
+                localStreams[localStreamNumber].mids = mids
+                const tracks = transceivers.map(({ mid, sender }) => ([
+                    sender?.track?.id, mid, localStreamNumber, "local", true, "", roomId
+                ]))
+                set({ localStreams, localStreamNumber, localPeerConnection })
+                return {
+                    tracks,
+                    sdpString: offerStr
+                }
+            } catch (err) {
+                console.error("Error adding local track:", err)
+            } finally {
+                set({ isLoading: false })
+            }
+        }
 
         // end
 
