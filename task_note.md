@@ -10,8 +10,8 @@
     - [x] emit backend event
     - [x] emit frontend event
 
-- [ ] update fe
-- [ ] update be
+- [x] update fe
+- [x] update be
     - [x] cloudflare
     - [x] smartcontract
     - [x] domain
