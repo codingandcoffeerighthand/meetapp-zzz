@@ -56,7 +56,7 @@ const useLocalStream = create(
                 const tracks = transceivers.map(({ mid, sender }) => ([
                     sender?.track?.id, mid, localStreamNumber, "local", true, "", roomId
                 ]))
-                set({ localStreams, localStreamNumber, localPeerConnection })
+                set({ localStreams, localStreamNumber })
                 return {
                     sessionLocal,
                     tracks,
@@ -79,7 +79,7 @@ const useLocalStream = create(
             set({ localPeerConnection })
         },
 
-        addLocalTracks: async (stream, roomId) => {
+        addLocalTracks: async (stream, roomId, localSession) => {
             set({ isLoading: true })
             try {
                 const { localPeerConnection, localStreams } = get()
@@ -103,15 +103,31 @@ const useLocalStream = create(
                 localStreams[localStreamNumber].stream = stream
                 localStreams[localStreamNumber].mids = mids
                 const tracks = transceivers.map(({ mid, sender }) => ([
-                    sender?.track?.id, mid, localStreamNumber, "local", true, "", roomId
+                    sender?.track?.id, mid, localStreamNumber, "local", true, localSession, roomId
                 ]))
-                set({ localStreams, localStreamNumber, localPeerConnection })
+                set({ localStreams, localStreamNumber })
                 return {
                     tracks,
                     sdpString: offerStr
                 }
             } catch (err) {
                 console.error("Error adding local track:", err)
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+        removeStream: async (streamNum) => {
+            set({ isLoading: true })
+            try {
+                const { localPeerConnection, localStreams } = get()
+                if (!localPeerConnection) {
+                    throw new Error("Local peer connection not initialized")
+                }
+                const mids = localStreams[streamNum].mids
+                localStreams[streamNum].stream.getTracks().forEach(track => track.stop())
+                return mids
+            } catch (err) {
+                console.error("Error removing stream:", err)
             } finally {
                 set({ isLoading: false })
             }

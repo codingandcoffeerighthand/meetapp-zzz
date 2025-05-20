@@ -24,7 +24,10 @@ export default function CreateRoomComponent({ callCreateRoom, initialRoomId, ini
                     Join Room With Id
                 </Button>
                 <Button
-                    onClick={() => callCreateRoom(roomId, roomName)}>
+                    onClick={async () => {
+                        await callCreateRoom(roomId, roomName)
+                        joinRoom()
+                    }}>
                     Create Room
                 </Button>
             </div>

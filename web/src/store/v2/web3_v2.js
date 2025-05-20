@@ -186,6 +186,9 @@ const useWeb3V2Store = create(
                         case EventType.NoRemoteTracks:
                             await useRemoteStream.getState().handlerNoRemoteTracks(data?.data)
                             break
+                        case EventType.AddTracks:
+                            await get().handlerAddTracks(data?.data)
+                            break
                         default:
                             console.info("#### unknown event", evt)
                             break
@@ -226,7 +229,7 @@ const useWeb3V2Store = create(
                 const newSession = json?.new_session
                 set({ localSession: newSession })
                 console.info("new session", newSession)
-                useLocalStream.getState().localConnected(sdpAnswer)
+                await useLocalStream.getState().localConnected(sdpAnswer)
                 const rsdata = Web3.utils.toHex({
                     "room_id": roomId,
                 })
@@ -315,7 +318,7 @@ const useWeb3V2Store = create(
         addLocalTracks: async (stream, roomId) => {
             set({ isLoading: true })
             try {
-                const { tracks, sdpString } = await useLocalStream.getState().addLocalTracks(stream, roomId)
+                const { tracks, sdpString } = await useLocalStream.getState().addLocalTracks(stream, roomId, get().localSession)
                 const { contract, account, localSession } = get()
                 await contract.methods.addTracks(roomId, localSession, tracks, sdpString).send({ from: account })
             } catch (err) {
@@ -324,8 +327,38 @@ const useWeb3V2Store = create(
             } finally {
                 set({ isLoading: false })
             }
+        },
+        handlerAddTracks: async (data) => {
+            set({ isLoading: true })
+            try {
+                const sdpAnswer = Web3.utils.hexToUtf8(data)
+                await useLocalStream.getState().localConnected(sdpAnswer)
+                const dt = Web3.utils.toHex({
+                    "room_id": get().roomId,
+                })
+                await get().emitLocalConnected(get().roomId, dt)
+            } catch (err) {
+                console.error("Error handling add tracks:", err)
+                set({ error: err })
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+        removeStream: async (streamId) => {
+            set({ isLoading: true })
+            try {
+                console.log("remove stream", streamId)
+                const { contract, account, localSession, roomId } = get()
+                const mids = await useLocalStream.getState().removeStream(streamId)
+                const tx = await contract.methods.removeTracks(roomId, localSession, mids).send({ from: account })
+                console.info("tx", tx)
+            } catch (err) {
+                console.error("Error removing stream:", err)
+                set({ error: err })
+            } finally {
+                set({ isLoading: false })
+            }
         }
-        // end
     })))
 
 const EventType = {
@@ -335,6 +368,7 @@ const EventType = {
     RemoteConnect: "remote_connect",
     RemoteConnectSuccess: "remote_connect_success",
     NoRemoteTracks: "no-remote-tracks",
+    AddTracks: "add_tracks",
 }
 
 export {

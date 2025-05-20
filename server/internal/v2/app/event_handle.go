@@ -150,7 +150,6 @@ func (s *App) AddTracksHandler(ctx context.Context, evt *domain.AddTracksEvent) 
 			s.errChan <- err
 		}
 	}()
-	go s.PullTracksForRoom(ctx, evt.RoomID)
 	return nil
 }
 
