@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"proxy-srv/internal/v2/domain"
+	"time"
 )
 
-func (a *app) JoinRoomHandler(ctx context.Context, evt *domain.JoinRoomEvent) error {
+func (a *App) JoinRoomHandler(ctx context.Context, evt *domain.JoinRoomEvent) error {
 	defer func() {
 		if r := recover(); r != nil {
 			a.errChan <- fmt.Errorf("join room %v", r)
@@ -45,7 +46,14 @@ func (a *app) JoinRoomHandler(ctx context.Context, evt *domain.JoinRoomEvent) er
 		return err
 	}
 	go func() {
-		err := a.meet.EmitFrontEndEvent(ctx, evt.RoomID, newSession, domain.EventJoinedRoomName, []byte(sdpAnswer))
+		domainEvent := struct {
+			SDPAnswer  string `json:"sdp_answer"`
+			NewSession string `json:"new_session"`
+		}{}
+		domainEvent.SDPAnswer = sdpAnswer
+		domainEvent.NewSession = newSession
+		evtJson, _ := json.Marshal(domainEvent)
+		err := a.meet.EmitFrontEndEvent(ctx, evt.RoomID, evt.SessionID, domain.EventJoinedRoomName, evtJson)
 		if err != nil {
 			a.errChan <- err
 		}
@@ -57,7 +65,7 @@ func (a *app) JoinRoomHandler(ctx context.Context, evt *domain.JoinRoomEvent) er
 	after local connected, pull tracks from meet
 */
 
-func (a *app) PullTracksForRoom(ctx context.Context, roomID string) error {
+func (a *App) PullTracksForRoom(ctx context.Context, roomID string) error {
 	defer func() {
 		if r := recover(); r != nil {
 			a.errChan <- fmt.Errorf("pull tracks for participant %v", r)
@@ -78,7 +86,7 @@ func (a *app) PullTracksForRoom(ctx context.Context, roomID string) error {
 	return nil
 }
 
-func (a *app) PullTracksForParticipant(ctx context.Context,
+func (a *App) PullTracksForParticipant(ctx context.Context,
 	roomID string, sessionID string,
 	tracksOfRoom []domain.Track) error {
 	defer func() {
@@ -97,6 +105,9 @@ func (a *app) PullTracksForParticipant(ctx context.Context,
 		if track.SessionID != sessionID {
 			tracksOfParticipant = append(tracksOfParticipant, track)
 		}
+	}
+	if len(tracksOfParticipant) == 0 {
+		return nil
 	}
 
 	sdpoffer, err := a.clf.AddRemoteTrack(ctx, remoteSession, tracksOfParticipant)
@@ -119,7 +130,7 @@ func (a *app) PullTracksForParticipant(ctx context.Context,
 	return nil
 }
 
-func (s *app) AddTracksHandler(ctx context.Context, evt *domain.AddTracksEvent) error {
+func (s *App) AddTracksHandler(ctx context.Context, evt *domain.AddTracksEvent) error {
 	defer func() {
 		if r := recover(); r != nil {
 			s.errChan <- fmt.Errorf("add tracks %v", r)
@@ -137,10 +148,11 @@ func (s *app) AddTracksHandler(ctx context.Context, evt *domain.AddTracksEvent) 
 			s.errChan <- err
 		}
 	}()
+	go s.PullTracksForRoom(ctx, evt.RoomID)
 	return nil
 }
 
-func (s *app) RemoveTracksHandler(ctx context.Context, evt *domain.RemoveTracksEvent) error {
+func (s *App) RemoveTracksHandler(ctx context.Context, evt *domain.RemoveTracksEvent) error {
 	defer func() {
 		if r := recover(); r != nil {
 			s.errChan <- fmt.Errorf("remove tracks %v", r)
@@ -153,12 +165,13 @@ func (s *app) RemoveTracksHandler(ctx context.Context, evt *domain.RemoveTracksE
 	return nil
 }
 
-func (s *app) LocalConnectedHandler(ctx context.Context, evt *domain.LocalConnectedEvent) error {
+func (s *App) LocalConnectedHandler(ctx context.Context, evt *domain.LocalConnectedEvent) error {
 	defer func() {
 		if r := recover(); r != nil {
 			s.errChan <- fmt.Errorf("local connected %v", r)
 		}
 	}()
+	time.Sleep(3 * time.Second)
 	err := s.PullTracksForRoom(ctx, evt.RoomID)
 	if err != nil {
 		return err
@@ -166,7 +179,7 @@ func (s *app) LocalConnectedHandler(ctx context.Context, evt *domain.LocalConnec
 	return nil
 }
 
-func (s *app) RemoteConnectedHandler(ctx context.Context, evt *domain.RemoteConnectedEvent) error {
+func (s *App) RemoteConnectedHandler(ctx context.Context, sessionID string, evt *domain.RemoteConnectedEvent) error {
 	defer func() {
 		if r := recover(); r != nil {
 			s.errChan <- fmt.Errorf("remote connected %v", r)
@@ -192,7 +205,7 @@ func (s *app) RemoteConnectedHandler(ctx context.Context, evt *domain.RemoteConn
 			Tracks: tracks,
 		}
 		evtJson, _ := json.Marshal(evtDomain)
-		err = s.meet.EmitFrontEndEvent(ctx, evt.RoomID, evt.RemoteSessionID, domain.EventRemoteConectSuccessName, evtJson)
+		err = s.meet.EmitFrontEndEvent(ctx, evt.RoomID, sessionID, domain.EventRemoteConectSuccessName, evtJson)
 		if err != nil {
 			s.errChan <- err
 		}
@@ -200,7 +213,7 @@ func (s *app) RemoteConnectedHandler(ctx context.Context, evt *domain.RemoteConn
 	return nil
 }
 
-func (s *app) LeaveRoomHandler(ctx context.Context, evt *domain.LeaveRoomEvent) error {
+func (s *App) LeaveRoomHandler(ctx context.Context, evt *domain.LeaveRoomEvent) error {
 	defer func() {
 		if r := recover(); r != nil {
 			s.errChan <- fmt.Errorf("leave room %v", r)
@@ -210,7 +223,7 @@ func (s *app) LeaveRoomHandler(ctx context.Context, evt *domain.LeaveRoomEvent) 
 	return err
 }
 
-func (s *app) BackendHandler(ctx context.Context, evt *domain.BackendEvent) error {
+func (s *App) BackendHandler(ctx context.Context, evt *domain.BackendEvent) error {
 	defer func() {
 		if r := recover(); r != nil {
 			s.errChan <- fmt.Errorf("backend %v", r)
@@ -232,7 +245,7 @@ func (s *app) BackendHandler(ctx context.Context, evt *domain.BackendEvent) erro
 			s.errChan <- err
 			return err
 		}
-		return s.RemoteConnectedHandler(ctx, &remoteConnectEvent)
+		return s.RemoteConnectedHandler(ctx, evt.SessionID, &remoteConnectEvent)
 	default:
 		err := fmt.Errorf("unknown event type %s", evt.EventType)
 		s.errChan <- err

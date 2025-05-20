@@ -2,6 +2,7 @@ package infra_smc
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"proxy-srv/internal/v2/domain"
 	"proxy-srv/pkg/gencode/smc_gen/meet_smc"
@@ -48,11 +49,16 @@ func (s *smcInfra) SubJoinRoomEvent(ctx context.Context) (
 	}()
 	go func() {
 		for evt := range sink {
+			sdpOffer, err := base64.StdEncoding.DecodeString(evt.SdpOffer)
+			if err != nil {
+				s.errChan <- fmt.Errorf("sub join room event %v", err)
+				continue
+			}
 			evtDomain := &domain.JoinRoomEvent{
-				RoomID:    evt.RoomId.Hex(),
-				SessionID: evt.SessionId.Hex(),
+				RoomID:    evt.RoomId,
+				SessionID: evt.SessionId,
 				Tracks:    make([]domain.Track, len(evt.Tracks)),
-				SdpOffer:  evt.SdpOffer,
+				SdpOffer:  string(sdpOffer),
 			}
 			for i, track := range evt.Tracks {
 				evtDomain.Tracks[i] = domain.Track{
@@ -89,8 +95,8 @@ func (s *smcInfra) SubAddTracksEvent(ctx context.Context) (
 	go func() {
 		for evt := range sink {
 			evtDomain := &domain.AddTracksEvent{
-				RoomID:    evt.RoomId.Hex(),
-				SessionID: evt.SessionId.Hex(),
+				RoomID:    evt.RoomId,
+				SessionID: evt.SessionId,
 				Tracks:    make([]domain.Track, len(evt.Tracks)),
 				SdpOffer:  evt.SdpOffer,
 			}
@@ -132,8 +138,8 @@ func (s *smcInfra) SubRemoveTrack(ctx context.Context) (
 	go func() {
 		for evt := range sink {
 			evtDomain := &domain.RemoveTracksEvent{
-				RoomID:    evt.RoomId.Hex(),
-				SessionID: evt.SessionId.Hex(),
+				RoomID:    evt.RoomId,
+				SessionID: evt.SessionId,
 				SdpOffer:  evt.SdpOffer,
 			}
 			sinkDomain <- evtDomain
@@ -162,8 +168,8 @@ func (s *smcInfra) SubLeaveRoomEvent(ctx context.Context) (
 	go func() {
 		for evt := range sink {
 			evtDomain := &domain.LeaveRoomEvent{
-				RoomID:    evt.RoomId.Hex(),
-				SessionID: evt.SessionId.Hex(),
+				RoomID:    evt.RoomId,
+				SessionID: evt.SessionId,
 			}
 			sinkDomain <- evtDomain
 		}
@@ -191,8 +197,8 @@ func (s *smcInfra) SubBackendEvent(ctx context.Context) (
 	go func() {
 		for evt := range sink {
 			evtDomain := &domain.BackendEvent{
-				RoomID:    evt.RoomId.Hex(),
-				SessionID: evt.SessionId.Hex(),
+				RoomID:    evt.RoomId,
+				SessionID: evt.SessionId,
 				EventType: evt.EventType,
 				Data:      evt.Data,
 			}

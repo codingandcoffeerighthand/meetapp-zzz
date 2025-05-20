@@ -117,10 +117,11 @@ func (s *smcInfra) GetRoomInfo(ctx context.Context, roomID string) (
 		}
 		for j, track := range roomInfo.Participants[i].Tracks {
 			rs.Participants[i].Tracks[j] = domain.Track{
-				Mid:       track.Mid,
-				TrackName: track.TrackName,
-				SessionID: track.SessionId,
-				Location:  track.Location,
+				Mid:          track.Mid,
+				TrackName:    track.TrackName,
+				StreamNumber: uint(track.StreamNumber.Int64()),
+				SessionID:    track.SessionId,
+				Location:     track.Location,
 			}
 		}
 	}

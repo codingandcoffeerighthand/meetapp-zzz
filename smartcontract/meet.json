@@ -616,13 +616,13 @@
       {
         "name": "roomId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
         "name": "sessionId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
@@ -684,13 +684,13 @@
       {
         "name": "roomId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
         "name": "sessionId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
@@ -713,15 +713,21 @@
     "name": "FrontendEvent",
     "inputs": [
       {
-        "name": "roomId",
+        "name": "seesionHash",
         "type": "string",
         "indexed": true,
         "internalType": "string"
       },
       {
+        "name": "roomId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
         "name": "sessionId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
@@ -746,13 +752,13 @@
       {
         "name": "roomId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
         "name": "sessionId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
@@ -814,13 +820,13 @@
       {
         "name": "roomId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
         "name": "sessionId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       }
     ],
@@ -831,15 +837,21 @@
     "name": "NewSessionEvent",
     "inputs": [
       {
-        "name": "roomId",
+        "name": "seesionHash",
         "type": "string",
         "indexed": true,
         "internalType": "string"
       },
       {
+        "name": "roomId",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
         "name": "oldSessionId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
@@ -858,13 +870,13 @@
       {
         "name": "roomId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
         "name": "sessionId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
@@ -889,7 +901,7 @@
       {
         "name": "roomId",
         "type": "string",
-        "indexed": true,
+        "indexed": false,
         "internalType": "string"
       },
       {
@@ -901,7 +913,7 @@
       {
         "name": "creator",
         "type": "address",
-        "indexed": true,
+        "indexed": false,
         "internalType": "address"
       }
     ],

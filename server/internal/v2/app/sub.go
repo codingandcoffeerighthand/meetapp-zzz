@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (a *app) SubJoinRoom(ctx context.Context) error {
+func (a *App) SubJoinRoom(ctx context.Context) error {
 	c, sub, err := a.meet.SubJoinRoomEvent(ctx)
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func (a *app) SubJoinRoom(ctx context.Context) error {
 	return nil
 }
 
-func (a *app) SubLeaveRoom(ctx context.Context) error {
+func (a *App) SubLeaveRoom(ctx context.Context) error {
 	c, sub, err := a.meet.SubLeaveRoomEvent(ctx)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (a *app) SubLeaveRoom(ctx context.Context) error {
 	return nil
 }
 
-func (a *app) SubAddTracks(ctx context.Context) error {
+func (a *App) SubAddTracks(ctx context.Context) error {
 	c, sub, err := a.meet.SubAddTracksEvent(ctx)
 	if err != nil {
 		return err
@@ -80,7 +80,7 @@ func (a *app) SubAddTracks(ctx context.Context) error {
 	return nil
 }
 
-func (a *app) SubRemoveTracks(ctx context.Context) error {
+func (a *App) SubRemoveTracks(ctx context.Context) error {
 	c, sub, err := a.meet.SubRemoveTrack(ctx)
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func (a *app) SubRemoveTracks(ctx context.Context) error {
 	return nil
 }
 
-func (a *app) SubBackend(ctx context.Context) error {
+func (a *App) SubBackend(ctx context.Context) error {
 	c, sub, err := a.meet.SubBackendEvent(ctx)
 	if err != nil {
 		return err
@@ -130,6 +130,6 @@ func (a *app) SubBackend(ctx context.Context) error {
 	return nil
 }
 
-func (a *app) Unsubscribe() {
+func (a *App) Unsubscribe() {
 	a.unsubscribe()
 }

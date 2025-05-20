@@ -5,35 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "proxy",
+            "name": "v2",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "cwd": "${workspaceFolder}/server",
-            "program": "${workspaceFolder}/server/cmd/server/main.go",
+            "program": "${workspaceFolder}/server/cmd/v2/main.go",
             "args": [
-                "proxy"
-            ]
-        },
-        {
-            "name": "ws",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "cwd": "${workspaceFolder}/server",
-            "program": "${workspaceFolder}/server/cmd/server/main.go",
-            "args": [
-                "ws"
-            ]
-        },
-    ],
-    "compounds": [
-        {
-            "name": "Compound",
-            "configurations": [
-                "proxy",
-                "ws"
+                "run"
             ]
         }
-    ]
+    ],
 }

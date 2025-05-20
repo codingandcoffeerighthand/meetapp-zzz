@@ -53,44 +53,42 @@ contract Meet {
      *******************************
      */
 
-    event RoomCreatedEvent(
-        string indexed roomId,
-        string name,
-        address indexed creator
-    );
+    event RoomCreatedEvent(string roomId, string name, address creator);
     event JoinRoomEvent(
-        string indexed roomId,
-        string indexed sessionId,
+        string roomId,
+        string sessionId,
         Track[] tracks,
         string sdpOffer
     );
     event AddTracksEvent(
-        string indexed roomId,
-        string indexed sessionId,
+        string roomId,
+        string sessionId,
         Track[] tracks,
         string sdpOffer
     );
     event RemoveTracksEvent(
-        string indexed roomId,
-        string indexed sessionId,
+        string roomId,
+        string sessionId,
         string[] mids,
         string sdpOffer
     );
-    event LeftRoomEvent(string indexed roomId, string indexed sessionId);
+    event LeftRoomEvent(string roomId, string sessionId);
     event NewSessionEvent(
-        string indexed roomId,
-        string indexed oldSessionId,
+        string indexed seesionHash,
+        string roomId,
+        string oldSessionId,
         string newSessionId
     );
     event BackendEvent(
-        string indexed roomId,
-        string indexed sessionId,
+        string roomId,
+        string sessionId,
         string eventType,
         bytes data
     );
     event FrontendEvent(
-        string indexed roomId,
-        string indexed sessionId,
+        string indexed seesionHash,
+        string roomId,
+        string sessionId,
         string eventType,
         bytes data
     );
@@ -223,7 +221,12 @@ contract Meet {
                 .tracks[i]
                 .sessionId = _newSessionId;
         }
-        emit NewSessionEvent(_roomId, _oldSessionId, _newSessionId);
+        emit NewSessionEvent(
+            _oldSessionId,
+            _roomId,
+            _oldSessionId,
+            _newSessionId
+        );
     }
 
     function addTracks(
@@ -380,7 +383,7 @@ contract Meet {
         string memory _eventType,
         bytes memory _data
     ) public onlyOwner {
-        emit FrontendEvent(_roomId, _sessionId, _eventType, _data);
+        emit FrontendEvent(_sessionId, _roomId, _sessionId, _eventType, _data);
     }
 
     /*

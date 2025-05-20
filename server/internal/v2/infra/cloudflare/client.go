@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"proxy-srv/internal/proxy/configs"
+	"proxy-srv/internal/v2/configs"
 	domain "proxy-srv/internal/v2/domain"
 	"proxy-srv/pkg/gencode/cloudflare_client"
 	"sync"
@@ -129,22 +129,13 @@ func (c *cloudFlareInfa) RenegatiateSession(
 		Sdp:  &sdpAnswer,
 		Type: &answerType,
 	}
-	resp, err := c.PutAppsAppIdSessionsSessionIdRenegotiateWithResponse(
+	_, err := c.PutAppsAppIdSessionsSessionIdRenegotiateWithResponse(
 		ctx, c.appId, session,
 		cloudflare_client.PutAppsAppIdSessionsSessionIdRenegotiateJSONRequestBody{
 			SessionDescription: &sdpInfo,
 		},
 	)
-	if resp == nil {
-		return "", err
-	}
-	if resp.JSON200 == nil {
-		return "", fmt.Errorf("error renegotiate session: %v", resp.HTTPResponse)
-	}
-	if resp.JSON200.Sdp == nil {
-		return "", errors.New("error passing JSON response for renegotiate session")
-	}
-	return *resp.JSON200.Sdp, err
+	return "", err
 }
 
 func (c *cloudFlareInfa) GetStatusSession(sessionId string) (

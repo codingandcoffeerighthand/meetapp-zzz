@@ -20,9 +20,9 @@ type MeetInfra interface {
 	SetNewSession(ctx context.Context, roomID string, oldSessionID string, sessionID string) error
 	EmitFrontEndEvent(ctx context.Context, roomID string, sessionID string, eventType string, data []byte) error
 	GetRoomInfo(ctx context.Context, roomID string) (domain.Room, error)
-	SubJoinRoomEvent(ctx context.Context) (chan *domain.JoinRoomEvent, domain.Subscription, error)
-	SubLeaveRoomEvent(ctx context.Context) (chan *domain.LeaveRoomEvent, domain.Subscription, error)
-	SubAddTracksEvent(ctx context.Context) (chan *domain.AddTracksEvent, domain.Subscription, error)
-	SubRemoveTrack(ctx context.Context) (chan *domain.RemoveTracksEvent, domain.Subscription, error)
-	SubBackendEvent(ctx context.Context) (chan *domain.BackendEvent, domain.Subscription, error)
+	SubJoinRoomEvent(ctx context.Context) (<-chan *domain.JoinRoomEvent, domain.Subscription, error)
+	SubLeaveRoomEvent(ctx context.Context) (<-chan *domain.LeaveRoomEvent, domain.Subscription, error)
+	SubAddTracksEvent(ctx context.Context) (<-chan *domain.AddTracksEvent, domain.Subscription, error)
+	SubRemoveTrack(ctx context.Context) (<-chan *domain.RemoveTracksEvent, domain.Subscription, error)
+	SubBackendEvent(ctx context.Context) (<-chan *domain.BackendEvent, domain.Subscription, error)
 }
