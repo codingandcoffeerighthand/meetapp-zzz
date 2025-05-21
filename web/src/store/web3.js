@@ -27,7 +27,7 @@ const useWeb3Store = create(
                 set({ isLoading: true, error: null })
                 try {
                     let web3Instance;
-                    const provider = new Web3.providers.WebsocketProvider(process.env.NEXT_PUBLIC_INFURA_URL);
+                    const provider = new Web3.providers.WebsocketProvider(process.env.NEXT_PUBLIC_WS_URL);
                     web3Instance = new Web3(provider);
                     const prK = privateKey
                     if (!prK) {

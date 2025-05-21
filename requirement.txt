@@ -1,3 +1,5 @@
-apt install -y jq yq protobuf-compiler
+apt install -y jq yq protobuf-compiler -y
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+git clone https://github.com/foundry-rs/forge-std.git ./smartcontract/lib/forge-std
