@@ -5,10 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"proxy-srv/internal/v2/domain"
+	"sync"
 	"time"
+
+	"github.com/romdo/go-debounce"
 )
 
 func (a *App) JoinRoomHandler(ctx context.Context, evt *domain.JoinRoomEvent) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
 	defer func() {
 		if r := recover(); r != nil {
 			a.errChan <- fmt.Errorf("join room %v", r)
@@ -62,11 +67,32 @@ func (a *App) JoinRoomHandler(ctx context.Context, evt *domain.JoinRoomEvent) er
 }
 
 /*
-	after local connected, pull tracks from meet
+after local connected, pull tracks from meet
 */
+var mapHandlePullRoom = make(map[string]func())
+var muMapHandlePullRoom sync.Mutex
 
 func (a *App) PullTracksForRoom(ctx context.Context, roomID string) error {
-	time.Sleep(3 * time.Second)
+	muMapHandlePullRoom.Lock()
+	defer muMapHandlePullRoom.Unlock()
+	if f, ok := mapHandlePullRoom[roomID]; ok {
+		f()
+	}
+	nf, _ := debounce.New(1*time.Second, func() {
+		err := a.PullRoom(ctx, roomID)
+		if err != nil {
+			a.errChan <- err
+		}
+	})
+	mapHandlePullRoom[roomID] = nf
+	nf()
+	return nil
+}
+
+func (a *App) PullRoom(ctx context.Context, roomID string) error {
+	// time.Sleep(3 * time.Second)
+	a.mu.Lock()
+	defer a.mu.Unlock()
 	defer func() {
 		if r := recover(); r != nil {
 			a.errChan <- fmt.Errorf("pull tracks for participant %v", r)
@@ -133,6 +159,8 @@ func (a *App) PullTracksForParticipant(ctx context.Context,
 }
 
 func (s *App) AddTracksHandler(ctx context.Context, evt *domain.AddTracksEvent) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	defer func() {
 		if r := recover(); r != nil {
 			s.errChan <- fmt.Errorf("add tracks %v", r)

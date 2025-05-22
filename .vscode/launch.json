@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "command": "bun dev",
+            "name": "web",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/web",
+            "type": "node-terminal"
+        },
+        {
             "name": "v2",
             "type": "go",
             "request": "launch",
@@ -14,6 +21,6 @@
             "args": [
                 "run"
             ]
-        }
+        },
     ],
 }

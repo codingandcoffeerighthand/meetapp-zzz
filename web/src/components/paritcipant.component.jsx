@@ -8,13 +8,14 @@ import { Label } from "./ui/label"
 import { useState } from "react"
 import ErrorComponent from "./error.component"
 import LoadingScreen from "./loading.component"
+import { cn } from "@/lib/utils"
 
 export default function ParticipantComponent({ roomId }) {
     const { account, isLoading: web3Loading, error: web3Error,
         handleJoinRoom, callLeaveRoom, addLocalTracks
     } = useWeb3V2Store()
     if (!account) {
-        if (window) {
+        if (typeof window !== "undefined") {
             window.location.href = "/v2"
         }
     }
@@ -27,7 +28,10 @@ export default function ParticipantComponent({ roomId }) {
         await addLocalTracks(stream, roomId)
     }
     return (
-        <>
+        <div className={cn(
+            "flex flex-col gap-4",
+            web3Loading && "pointer-events-none"
+        )}>
             {web3Error && <ErrorComponent error={web3Error} />}
             <div className="flex flex-row gap-4 justify-between">
 
@@ -57,7 +61,7 @@ export default function ParticipantComponent({ roomId }) {
                     <Button
                         onClick={() => {
                             callLeaveRoom(roomId, () => {
-                                if (window) {
+                                if (typeof window !== "undefined") {
                                     window.location.href = "/v2"
                                 }
                             })
@@ -67,7 +71,7 @@ export default function ParticipantComponent({ roomId }) {
                     </Button>
                 </Card>
             </div>
-            {web3Loading && <LoadingScreen />}
-        </>
+            {/* {web3Loading && <LoadingScreen />} */}
+        </div>
     )
 }

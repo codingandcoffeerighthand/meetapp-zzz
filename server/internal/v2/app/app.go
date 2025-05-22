@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"go.uber.org/zap"
 )
@@ -14,6 +15,7 @@ type App struct {
 	errChan     chan error
 	unsubscribe func()
 	done        chan any
+	mu          sync.Mutex
 }
 
 func NewApp(cloudFlareInfa CloudFlareInfraV2, meetInfra MeetInfra, log *zap.Logger) *App {
