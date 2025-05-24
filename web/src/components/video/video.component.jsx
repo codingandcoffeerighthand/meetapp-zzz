@@ -1,16 +1,20 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { X, Volume2, VolumeX, Mic, MicOff } from "lucide-react"
+import { X, Volume2, VolumeX, Mic, MicOff, Camera, CameraOff } from "lucide-react"
+import { Button } from "../ui/button"
 
 export default function MediaStreamPlayer({
     mediaStream, title,
     closeVideoCallback = () => { },
+    stopCammera = (ids) => { },
     isLocal = false, autoPlay = true }) {
     const [isMuted, setIsMuted] = useState(isLocal)
     const [isVisible, setIsVisible] = useState(true)
     const [hasAudio, setHasAudio] = useState(false)
     const [microphoneEnabled, setMicrophoneEnabled] = useState(true)
+    const [hasVideo, setHasVideo] = useState(false)
+    const [videoEnabled, setVideoEnabled] = useState(false)
     const videoRef = useRef(null)
 
     // Set the MediaStream as the video source and check for audio tracks
@@ -27,17 +31,23 @@ export default function MediaStreamPlayer({
                 setMicrophoneEnabled(audioTracks[0].enabled)
             }
 
-            // Listen for track additions/removals to update hasAudio state
-            const handleTrackChange = (evt) => {
+            // Check video tracks
+            const videoTracks = mediaStream.getVideoTracks()
+            setHasVideo(videoTracks.length > 0)
+            setVideoEnabled(videoTracks.some(track => track.enabled))
 
-                console.info("add track", evt, mediaStream.getAudioTracks)
+            // Listen for track additions/removals to update hasAudio/hasVideo state
+            const handleTrackChange = (evt) => {
+                // Audio
                 const updatedAudioTracks = mediaStream.getAudioTracks()
                 setHasAudio(updatedAudioTracks.length > 0)
-
-                // Update microphone state if tracks change
                 if (updatedAudioTracks.length > 0) {
                     setMicrophoneEnabled(updatedAudioTracks[0].enabled)
                 }
+                // Video
+                const updatedVideoTracks = mediaStream.getVideoTracks()
+                setHasVideo(updatedVideoTracks.length > 0)
+                setVideoEnabled(updatedVideoTracks.some(track => track.enabled))
             }
             const handleInActive = () => {
                 setIsVisible(false)
@@ -61,6 +71,8 @@ export default function MediaStreamPlayer({
             // Reset states if there's no mediaStream
             setHasAudio(false)
             setMicrophoneEnabled(true)
+            setHasVideo(false)
+            setVideoEnabled(false)
         }
     }, [mediaStream])
 
@@ -79,6 +91,10 @@ export default function MediaStreamPlayer({
 
             // Toggle enabled state for all audio tracks
             const newEnabledState = !microphoneEnabled
+            if (!newEnabledState) {
+                const ids = mediaStream.getAudioTracks().map((track) => track?.id)
+                stopCammera(ids)
+            }
             audioTracks.forEach((track) => {
                 track.enabled = newEnabledState
             })
@@ -91,6 +107,15 @@ export default function MediaStreamPlayer({
         mediaStream.getTracks().forEach((track) => track.stop())
         setIsVisible(false)
         closeVideoCallback()
+    }
+    const closeCamera = () => {
+        const ids = mediaStream.getVideoTracks().map((track) => track?.id)
+        stopCammera(ids)
+        mediaStream.getVideoTracks().forEach((track) => track.stop())
+        setVideoEnabled(false)
+    }
+    const resumeCamera = () => {
+        mediaStream.getVideoTracks().forEach((track) => track.enabled = true)
     }
 
     // If video is closed, don't render anything
@@ -136,7 +161,7 @@ export default function MediaStreamPlayer({
             {/* Custom controls overlay */}
             <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-3 flex items-center justify-between">
                 {/* Left side - microphone control */}
-                <div className="text-white">
+                <div className="text-white flex gap-2">
                     {isLocal && hasAudio && (
                         <button
                             onClick={toggleMicrophone}
@@ -147,6 +172,23 @@ export default function MediaStreamPlayer({
                             {isLocal && microphoneEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
                         </button>
                     )}
+                    {
+                        isLocal && (
+                            hasVideo ? (
+                                videoEnabled ? (
+                                    <Button variant="ghost" size="icon" onClick={closeCamera} asChild>
+                                        <Camera
+                                            className="w-5 h-5" />
+                                    </Button>
+                                ) : (
+                                    <Button variant="ghost" size="icon" onClick={resumeCamera} disabled={true} asChild>
+                                        <CameraOff
+                                            className="w-5 h-5" />
+                                    </Button>
+                                )
+                            ) : null
+                        )
+                    }
                 </div>
 
                 {/* Right side controls */}

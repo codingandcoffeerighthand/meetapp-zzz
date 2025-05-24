@@ -131,7 +131,13 @@ const useLocalStream = create(
             } finally {
                 set({ isLoading: false })
             }
-        }
+        },
+        getMidsFromIds: (ids) => {
+            const { localPeerConnection } = get()
+            return localPeerConnection.getTransceivers().
+                filter(transceiver => ids.includes(transceiver?.sender?.track?.id))
+                .map(transceiver => transceiver.mid)
+        },
 
         // end
 

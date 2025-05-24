@@ -78,7 +78,7 @@ func (a *App) PullTracksForRoom(ctx context.Context, roomID string) error {
 	if f, ok := mapHandlePullRoom[roomID]; ok {
 		f()
 	}
-	nf, _ := debounce.New(1*time.Second, func() {
+	nf, _ := debounce.New(3*time.Second, func() {
 		err := a.PullRoom(ctx, roomID)
 		if err != nil {
 			a.errChan <- err

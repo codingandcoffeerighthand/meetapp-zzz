@@ -9,7 +9,7 @@ export default function CreateRoomComponent({ callCreateRoom, initialRoomId, ini
     const [roomId, setRoomId] = useState(initialRoomId)
     const router = useRouter()
     const joinRoom = () => {
-        router.push(`/v2/room/${roomId}`)
+        router.push(`/room/${roomId}`)
     }
     return (
         <Card className="p-4 flex flex-row justify-start">

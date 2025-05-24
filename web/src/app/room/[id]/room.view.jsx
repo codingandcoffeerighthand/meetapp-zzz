@@ -8,7 +8,7 @@ import { useWeb3V2Store } from "@/store/v2/web3_v2"
 export default function RoomView({ roomId }) {
     const { localStreams } = useLocalStream()
     const { mapRemoteStreams } = useRemoteStream()
-    const { removeStream } = useWeb3V2Store()
+    const { removeStream, handleStopCamera } = useWeb3V2Store()
     const handleRemoveStream = async (streamNum) => {
         await removeStream(streamNum)
     }
@@ -18,6 +18,10 @@ export default function RoomView({ roomId }) {
                 <MediaStreamPlayer
                     mediaStream={stream?.stream} title={`local#${index}`} isLocal={true}
                     closeVideoCallback={() => handleRemoveStream(index)}
+                    stopCammera={(idx) => {
+                        console.info("room view stopCammera", idx)
+                        handleStopCamera(idx)
+                    }}
                 />
             </div>
         ))}

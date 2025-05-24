@@ -16,7 +16,7 @@ export default function ParticipantComponent({ roomId }) {
     } = useWeb3V2Store()
     if (!account) {
         if (typeof window !== "undefined") {
-            window.location.href = "/v2"
+            window.location.href = "/"
         }
     }
     const [participantName, setParticipantName] = useState("")
@@ -24,6 +24,13 @@ export default function ParticipantComponent({ roomId }) {
     const handlerAddLocalTracks = async () => {
         const stream = await navigator.mediaDevices.getDisplayMedia({
             video: true,
+        })
+        await addLocalTracks(stream, roomId)
+    }
+    const handlerAddCamera = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
         })
         await addLocalTracks(stream, roomId)
     }
@@ -53,6 +60,13 @@ export default function ParticipantComponent({ roomId }) {
                     </Button>
                     <Button
                         onClick={() => {
+                            handlerAddCamera()
+                        }}
+                    >
+                        Share camera
+                    </Button>
+                    <Button
+                        onClick={() => {
                             handlerAddLocalTracks()
                         }}
                     >
@@ -62,7 +76,7 @@ export default function ParticipantComponent({ roomId }) {
                         onClick={() => {
                             callLeaveRoom(roomId, () => {
                                 if (typeof window !== "undefined") {
-                                    window.location.href = "/v2"
+                                    window.location.href = "/"
                                 }
                             })
                         }}

@@ -358,7 +358,24 @@ const useWeb3V2Store = create(
             } finally {
                 set({ isLoading: false })
             }
-        }
+        },
+        handleStopCamera: async (ids) => {
+            set({ isLoading: true })
+            try {
+                console.info("handleStopCamera", ids)
+                const { contract, account, localSession, roomId } = get()
+                const mids = useLocalStream.getState().getMidsFromIds(ids)
+                console.info("mids", mids)
+                const tx = await contract.methods.removeTracks(roomId, localSession, mids).send({ from: account })
+                console.info("tx", tx)
+            } catch (err) {
+                console.error("Error stopping camera:", err)
+                set({ error: err })
+            } finally {
+                set({ isLoading: false })
+            }
+        },
+
     })))
 
 const EventType = {
