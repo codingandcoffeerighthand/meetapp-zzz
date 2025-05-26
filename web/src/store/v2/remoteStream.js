@@ -11,8 +11,8 @@ const useRemoteStream = create(
         remoteTracks: {},
         roomId: "",
         remotePeerConnection: null,
-        createRemotePeerConnection: async () => {
-            const remotePeerConnection = await createPeerConnection()
+        createRemotePeerConnection: async (servers = []) => {
+            const remotePeerConnection = await createPeerConnection(servers)
             remotePeerConnection.ontrack = (event) => {
                 if (event.track) {
                     const newStream = new MediaStream()
@@ -27,11 +27,11 @@ const useRemoteStream = create(
             }
             set({ remotePeerConnection })
         },
-        setRemoteStream: async (sdpOffer) => {
+        setRemoteStream: async (sdpOffer, servers = []) => {
             set({ isLoading: true })
             try {
                 set({ remoteStreams: [], remoteTracks: [] })
-                await get().createRemotePeerConnection()
+                await get().createRemotePeerConnection(servers)
                 const remotePeerConnection = get().remotePeerConnection
                 await remotePeerConnection.setRemoteDescription(
                     new RTCSessionDescription({ sdp: sdpOffer, type: "offer" }),

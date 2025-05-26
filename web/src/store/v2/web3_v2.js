@@ -62,6 +62,21 @@ const useWeb3V2Store = create(
                 }
             }
         },
+        getIceServers: async () => {
+            set({ isLoading: true })
+            try {
+                const { contract } = get()
+                const iceServers = await contract.methods.getIceServers().call({
+                    from: get().account
+                })
+                return iceServers
+            } catch (err) {
+                console.error("Error getting ice servers:", err)
+                set({ error: err })
+            } finally {
+                set({ isLoading: false })
+            }
+        },
         _modifierContract: () => {
             const { contract, account, isWeb3Connected } = get()
             if (!contract) {

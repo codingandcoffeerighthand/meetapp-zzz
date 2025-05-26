@@ -21,11 +21,11 @@ const useLocalStream = create(
         localStreams: [],
         sessionLocal: "",
         roomId: "",
-        createLocalPeerConnection: async () => {
-            const localPeerConnection = await createPeerConnection()
+        createLocalPeerConnection: async (servers = []) => {
+            const localPeerConnection = await createPeerConnection(servers)
             set({ localPeerConnection })
         },
-        setLocalStream: async (roomId) => {
+        setLocalStream: async (roomId, servers = []) => {
             set({ isLoading: true })
             try {
                 set({ roomId })
