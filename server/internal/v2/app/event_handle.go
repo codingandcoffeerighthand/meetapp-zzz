@@ -105,10 +105,12 @@ func (a *App) PullRoom(ctx context.Context, roomID string) error {
 
 	tracksOfRoom := roomInfo.GetAllTracks()
 	for _, participant := range roomInfo.Participants {
-		err := a.PullTracksForParticipant(ctx, roomID, participant.SessionID, tracksOfRoom)
-		if err != nil {
-			a.errChan <- err
-		}
+		go func() {
+			err := a.PullTracksForParticipant(ctx, roomID, participant.SessionID, tracksOfRoom)
+			if err != nil {
+				a.errChan <- err
+			}
+		}()
 	}
 	return nil
 }

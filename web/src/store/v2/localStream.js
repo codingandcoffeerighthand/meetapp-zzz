@@ -123,9 +123,10 @@ const useLocalStream = create(
                 if (!localPeerConnection) {
                     throw new Error("Local peer connection not initialized")
                 }
-                const mids = localStreams[streamNum].mids
-                localStreams[streamNum].stream.getTracks().forEach(track => track.stop())
-                return mids
+                const ids = localStreams[streamNum].stream.getTracks()
+                    .filter(track => track.enabled)
+                    .map(track => track.id)
+                return get().getMidsFromIds(ids)
             } catch (err) {
                 console.error("Error removing stream:", err)
             } finally {

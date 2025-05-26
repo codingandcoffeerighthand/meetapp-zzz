@@ -9,7 +9,6 @@ import (
 	domain "proxy-srv/internal/v2/domain"
 	"proxy-srv/pkg/gencode/cloudflare_client"
 	"sync"
-	"time"
 )
 
 type cloudFlareInfa struct {
@@ -98,7 +97,6 @@ func (c *cloudFlareInfa) AddRemoteTrack(
 	string, error,
 ) {
 	muAddRemoteTrack.Lock()
-	time.Sleep(100 * time.Millisecond)
 	defer muAddRemoteTrack.Unlock()
 	tracks := make([]cloudflare_client.TrackObject, len(domainTracks))
 	remoteVal := cloudflare_client.TrackObjectLocationRemote
