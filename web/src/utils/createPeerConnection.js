@@ -1,9 +1,11 @@
-async function createPeerConnection(servers) {
+async function createPeerConnection(servers = []) {
     const iceServers = [
         {
             urls: "stun:stun.cloudflare.com:3478",
         },
-    ].push(...servers)
+        ...servers
+    ]
+    console.info(iceServers)
     const peerConnection = new RTCPeerConnection({
         iceServers,
         bundlePolicy: "max-bundle",
